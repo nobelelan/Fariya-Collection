@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/extraFragment"
         android:name="com.example.fariyafardinfarhancollection.ui.fragment.ExtraFragment"
-        android:label="fragment_exxtras"
+        android:label="Others"
         tools:layout="@layout/fragment_extra" />
 </navigation>

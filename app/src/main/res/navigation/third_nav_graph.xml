@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/storehouseFragment"
         android:name="com.example.fariyafardinfarhancollection.ui.fragment.StorehouseFragment"
-        android:label="fragment_storehouse"
+        android:label="Store"
         tools:layout="@layout/fragment_storehouse" />
 </navigation>

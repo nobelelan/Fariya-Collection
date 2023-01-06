@@ -8,6 +8,6 @@
     <fragment
         android:id="@+id/customerContactsFragment"
         android:name="com.example.fariyafardinfarhancollection.ui.fragment.CustomerContactsFragment"
-        android:label="fragment_customer_contacts"
+        android:label="Contacts"
         tools:layout="@layout/fragment_customer_contacts" />
 </navigation>
