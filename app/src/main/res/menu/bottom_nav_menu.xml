@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/first_nav_graph"
+        android:title="Sale"
+        android:icon="@drawable/ic_calculation"/>
+    <item
+        android:id="@+id/second_nav_graph"
+        android:title="Contacts"
+        android:icon="@drawable/ic_contact"/>
+    <item
+        android:id="@+id/third_nav_graph"
+        android:title="Store"
+        android:icon="@drawable/ic_storage"/>
+    <item
+        android:id="@+id/fourth_nav_graph"
+        android:title="Others"
+        android:icon="@drawable/ic_others"/>
+</menu>

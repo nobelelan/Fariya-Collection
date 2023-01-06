@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/third_nav_graph"
+    app:startDestination="@id/storehouseFragment">
+
+    <fragment
+        android:id="@+id/storehouseFragment"
+        android:name="com.example.fariyafardinfarhancollection.ui.fragment.StorehouseFragment"
+        android:label="fragment_storehouse"
+        tools:layout="@layout/fragment_storehouse" />
+</navigation>
