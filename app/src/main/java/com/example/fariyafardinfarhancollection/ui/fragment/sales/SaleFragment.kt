@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.size
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -44,22 +45,39 @@ class SaleFragment : Fragment() {
         val shopViewModelProviderFactory = ShopViewModelProviderFactory(requireActivity().application, shopRepository)
         shopViewModel = ViewModelProvider(this, shopViewModelProviderFactory)[ShopViewModel::class.java]
 
+        setUpProductCountRecyclerView()
+
+        shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+            salesProductCountAdapter.differ.submitList(it)
+        })
+
+        salesProductCountAdapter.setUpdateItemListener(object : SalesProductCountAdapter.UpdateItemListener{
+            override fun updateProductCount(id: Int, name: String, quantity: String, price: String, total: String) {
+                val toUpdate = ProductCount(id, name, quantity, price, total)
+                Toast.makeText(requireContext(), "$id,$name,$quantity,$price,$total", Toast.LENGTH_LONG).show()
+                shopViewModel.updateProductCount(toUpdate)
+            }
+        })
+
+    }
+
+    private fun setUpProductCountRecyclerView() {
         val rvRetailItems = binding.rvRetailItems
         rvRetailItems.adapter = salesProductCountAdapter
         rvRetailItems.layoutManager = LinearLayoutManager(requireContext())
 
-        val productCount1 = ProductCount(1, "", 0, 0, 0)
-        val productCount2 = ProductCount(2,"", 0, 0, 0)
-        val productCount3 = ProductCount(3,"", 0, 0, 0)
-        val productCount4 = ProductCount(4,"", 0, 0, 0)
-        val productCount5 = ProductCount(5,"", 0, 0, 0)
-        val productCount6 = ProductCount(6,"", 0, 0, 0)
-        val productCount7 = ProductCount(7,"", 0, 0, 0)
-        val productCount8 = ProductCount(8,"", 0, 0, 0)
-        val productCount9 = ProductCount(9,"", 0, 0, 0)
-        val productCount10 = ProductCount(10,"", 0, 0, 0)
-        val productCount11 = ProductCount(11,"", 0, 0, 0)
-        val productCount12 = ProductCount(12,"", 0, 0, 0)
+        val productCount1 = ProductCount(1)
+        val productCount2 = ProductCount(1)
+        val productCount3 = ProductCount(1)
+        val productCount4 = ProductCount(1)
+        val productCount5 = ProductCount(5)
+        val productCount6 = ProductCount(6)
+        val productCount7 = ProductCount(7)
+        val productCount8 = ProductCount(8)
+        val productCount9 = ProductCount(9)
+        val productCount10 = ProductCount(10)
+        val productCount11 = ProductCount(11)
+        val productCount12 = ProductCount(12)
 
         val emptyProductCount = arrayListOf(productCount1, productCount2, productCount3, productCount4, productCount5,
             productCount6, productCount7, productCount8, productCount9, productCount10, productCount11, productCount12)
@@ -68,16 +86,11 @@ class SaleFragment : Fragment() {
             shopViewModel.insertProductCount(it)
         }
 
-        shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
-            salesProductCountAdapter.differ.submitList(it)
-        })
-
         binding.btnAddNewProductItem.setOnClickListener {
-            shopViewModel.insertProductCount(ProductCount(0,"", 0, 0, 0))
+            shopViewModel.insertProductCount(ProductCount(0))
         }
-
-
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

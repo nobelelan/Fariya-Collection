@@ -7,3 +7,7 @@ fun verifyDataFromUser(username: String, email: String, password: String, passwo
 fun verifyLoginDataFromUser(email: String, password: String): Boolean{
     return (email.isNotEmpty() && password.isNotEmpty())
 }
+
+fun verifyProductCountDataFromUser(name: String, quantity: String, price: String): Boolean{
+    return (name.isNotEmpty() && quantity.isNotEmpty() && price.isNotEmpty() )
+}

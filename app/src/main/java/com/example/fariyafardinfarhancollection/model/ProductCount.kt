@@ -8,7 +8,7 @@ data class ProductCount(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 1,
     var name: String? = null,
-    var quantity: Int? = null,
-    var price: Int? = null,
-    var total: Int? = null
+    var quantity: String? = null,
+    var price: String? = null,
+    var total: String? = null
 )
