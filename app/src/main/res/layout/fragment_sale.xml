@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:context=".ui.fragment.SaleFragment">
+    tools:context=".ui.fragment.sales.SaleFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -69,13 +69,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_retail_items"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="440dp"
             android:layout_marginTop="4dp"
             tools:listitem="@layout/rv_sales_product_count"
             tools:itemCount="10"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent=".43"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_retail_text"
@@ -127,13 +126,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_wholesale_items"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="220dp"
             android:layout_marginTop="4dp"
             tools:listitem="@layout/rv_sales_product_count"
             tools:itemCount="5"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_percent=".23"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_wholesale_text"

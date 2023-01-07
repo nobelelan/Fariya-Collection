@@ -1,4 +1,4 @@
-package com.example.fariyafardinfarhancollection.ui.fragment
+package com.example.fariyafardinfarhancollection.ui.fragment.store
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

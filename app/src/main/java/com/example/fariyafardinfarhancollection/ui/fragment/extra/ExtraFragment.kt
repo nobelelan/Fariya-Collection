@@ -1,4 +1,4 @@
-package com.example.fariyafardinfarhancollection.ui.fragment
+package com.example.fariyafardinfarhancollection.ui.fragment.extra
 
 import android.content.Intent
 import android.os.Bundle

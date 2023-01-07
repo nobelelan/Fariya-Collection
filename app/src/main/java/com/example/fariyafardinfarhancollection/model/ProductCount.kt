@@ -1,9 +1,14 @@
 package com.example.fariyafardinfarhancollection.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "product_count_table")
 data class ProductCount(
-    val id: Int = 1,
-    val name: String = "",
-    val quantity: Int = 0,
-    val price: Int = 0,
-    val total: Int = 0
+    @PrimaryKey(autoGenerate = true)
+    var id: Int = 1,
+    var name: String? = null,
+    var quantity: Int? = null,
+    var price: Int? = null,
+    var total: Int? = null
 )
