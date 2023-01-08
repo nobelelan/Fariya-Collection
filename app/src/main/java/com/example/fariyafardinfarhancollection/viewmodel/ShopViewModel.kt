@@ -5,9 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
-import com.example.fariyafardinfarhancollection.model.ProductCount
-import com.example.fariyafardinfarhancollection.model.SaleToday
-import com.example.fariyafardinfarhancollection.model.WholesaleCount
+import com.example.fariyafardinfarhancollection.model.*
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import kotlinx.coroutines.launch
 
@@ -20,12 +18,16 @@ class ShopViewModel(
     val getAllProductCount: LiveData<List<ProductCount>>
     val getAllWholesaleCount: LiveData<List<WholesaleCount>>
     val getAllSaleToday: LiveData<List<SaleToday>>
+    val getAllOtherPaymentReceived: LiveData<List<OtherPaymentReceived>>
+    val getAllSpentToday: LiveData<List<SpentToday>>
 
     init {
         shopRepository = ShopRepository(shopDao)
         getAllProductCount = shopRepository.getAllProductCount()
         getAllWholesaleCount = shopRepository.getAllWholesaleCount()
         getAllSaleToday = shopRepository.getAllSaleToday()
+        getAllOtherPaymentReceived = shopRepository.getAllOtherPaymentReceived()
+        getAllSpentToday = shopRepository.getAllSpentToday()
     }
     fun insertProductCount(productCount: ProductCount){
         viewModelScope.launch {
@@ -64,6 +66,40 @@ class ShopViewModel(
     fun insertSaleToday(saleToday: SaleToday){
         viewModelScope.launch {
             shopRepository.insertSaleToday(saleToday)
+        }
+    }
+
+
+    fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived){
+        viewModelScope.launch {
+            shopRepository.insertOtherPaymentReceived(otherPaymentReceived)
+        }
+    }
+    fun updateOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived){
+        viewModelScope.launch {
+            shopRepository.updateOtherPaymentReceived(otherPaymentReceived)
+        }
+    }
+    fun deleteOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived){
+        viewModelScope.launch {
+            shopRepository.deleteOtherPaymentReceived(otherPaymentReceived)
+        }
+    }
+
+
+    fun insertSpentToday(spentToday: SpentToday){
+        viewModelScope.launch {
+            shopRepository.insertSpentToday(spentToday)
+        }
+    }
+    fun updateSpentToday(spentToday: SpentToday){
+        viewModelScope.launch {
+            shopRepository.updateSpentToday(spentToday)
+        }
+    }
+    fun deleteSpentToday(spentToday: SpentToday){
+        viewModelScope.launch {
+            shopRepository.deleteSpentToday(spentToday)
         }
     }
 }

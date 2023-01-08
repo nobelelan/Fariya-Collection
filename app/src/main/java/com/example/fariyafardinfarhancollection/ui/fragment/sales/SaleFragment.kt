@@ -19,9 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentSaleBinding
-import com.example.fariyafardinfarhancollection.model.ProductCount
-import com.example.fariyafardinfarhancollection.model.SaleToday
-import com.example.fariyafardinfarhancollection.model.WholesaleCount
+import com.example.fariyafardinfarhancollection.model.*
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
@@ -38,6 +36,9 @@ class SaleFragment : Fragment() {
     private val salesProductCountAdapter by lazy { SalesProductCountAdapter() }
     private val salesWholesaleCountAdapter by lazy { SalesWholesaleCountAdapter() }
     private val salesAdapter by lazy { SalesAdapter() }
+    private val otherPaymentReceivedAdapter by lazy { OtherPaymentReceivedAdapter() }
+    private val spentTodayAdapter by lazy { SpentTodayAdapter() }
+
     private lateinit var shopViewModel: ShopViewModel
 
     override fun onCreateView(
@@ -60,6 +61,8 @@ class SaleFragment : Fragment() {
         setUpRetailSalesRecyclerView()
         setUpWholeSaleRecyclerView()
         setUpSalesRecyclerView()
+        setUpOtherPaymentRecyclerView()
+        setUpSpentTodayRecyclerView()
         setUpCurrentDate()
 
         shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
@@ -70,6 +73,12 @@ class SaleFragment : Fragment() {
         })
         shopViewModel.getAllSaleToday.observe(viewLifecycleOwner, Observer {
             salesAdapter.differ.submitList(it)
+        })
+        shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+            otherPaymentReceivedAdapter.differ.submitList(it)
+        })
+        shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+            spentTodayAdapter.differ.submitList(it)
         })
 
         salesProductCountAdapter.setUpdateItemListener(object : SalesProductCountAdapter.UpdateItemListener{
@@ -82,6 +91,16 @@ class SaleFragment : Fragment() {
                 shopViewModel.updateWholesaleCount(WholesaleCount(id, name, quantity, price, total))
             }
         })
+        otherPaymentReceivedAdapter.setUpdateItemListener(object : OtherPaymentReceivedAdapter.UpdateItemListener{
+            override fun updateProductCount(otherPaymentId: Int, senderName: String, paymentMethod: String, amount: String) {
+                shopViewModel.updateOtherPaymentReceived(OtherPaymentReceived(otherPaymentId, senderName, paymentMethod, amount))
+            }
+        })
+        spentTodayAdapter.setUpdateItemListener(object : SpentTodayAdapter.UpdateItemListener{
+            override fun updateProductCount(spentTodayId: Int, reason: String, amount: String) {
+                shopViewModel.updateSpentToday(SpentToday(spentTodayId, reason, amount))
+            }
+        })
 
         binding.txtRetailTotal.setOnClickListener {
             setTotalRetailSale()
@@ -89,7 +108,69 @@ class SaleFragment : Fragment() {
         binding.txtWholesaleTotal.setOnClickListener {
             setTotalWholesale()
         }
+        binding.txtOtherPaymentTotal.setOnClickListener {
+            setTotalOtherPayment()
+        }
+        binding.txtSpentAmountTotal.setOnClickListener {
+            setTotalSpentToday()
+        }
 
+    }
+
+    private fun setTotalSpentToday() {
+        val totalSpentToday = arrayListOf<Int>()
+        shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+            it.forEach { spentToday ->
+                spentToday.amount?.let { amount -> totalSpentToday.add(amount.toInt()) }
+            }
+        })
+        binding.txtSpentAmountTotal.text = totalSpentToday.sum().toString()
+    }
+
+    private fun setTotalOtherPayment() {
+        val totalOtherPaymentReceived = arrayListOf<Int>()
+        shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+            it.forEach { otherPaymentReceived ->
+                otherPaymentReceived.amount?.let { amount -> totalOtherPaymentReceived.add(amount.toInt()) }
+            }
+        })
+        binding.txtOtherPaymentTotal.text = totalOtherPaymentReceived.sum().toString()
+    }
+
+    private fun setUpSpentTodayRecyclerView() {
+        val rvSpentToday = binding.rvSpentAmount
+        rvSpentToday.adapter = spentTodayAdapter
+        rvSpentToday.layoutManager = LinearLayoutManager(requireContext())
+
+        val spentToday1 = SpentToday(1)
+        val spentToday2 = SpentToday(2)
+        val spentToday3 = SpentToday(3)
+
+        val emptySpentToday = arrayListOf(spentToday1, spentToday2, spentToday3)
+        emptySpentToday.forEach{
+            shopViewModel.insertSpentToday(it)
+        }
+        binding.btnAddNewSpentAmount.setOnClickListener {
+            shopViewModel.insertSpentToday(SpentToday(0))
+        }
+    }
+
+    private fun setUpOtherPaymentRecyclerView() {
+        val rvOtherPayment = binding.rvOtherPayment
+        rvOtherPayment.adapter = otherPaymentReceivedAdapter
+        rvOtherPayment.layoutManager = LinearLayoutManager(requireContext())
+
+        val otherPaymentReceived1 = OtherPaymentReceived(1)
+        val otherPaymentReceived2 = OtherPaymentReceived(2)
+        val otherPaymentReceived3 = OtherPaymentReceived(3)
+
+        val emptyOtherPaymentReceived = arrayListOf(otherPaymentReceived1, otherPaymentReceived2, otherPaymentReceived3)
+        emptyOtherPaymentReceived.forEach{
+            shopViewModel.insertOtherPaymentReceived(it)
+        }
+        binding.btnAddNewOtherPayment.setOnClickListener {
+            shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -203,7 +284,6 @@ class SaleFragment : Fragment() {
         rvRetailItems.adapter = salesProductCountAdapter
         rvRetailItems.layoutManager = LinearLayoutManager(requireContext())
 
-        // TODO: check this out later if possible reduce this code in to forech, will work probably if id set to 0
         val productCount1 = ProductCount(1)
         val productCount2 = ProductCount(2)
         val productCount3 = ProductCount(3)

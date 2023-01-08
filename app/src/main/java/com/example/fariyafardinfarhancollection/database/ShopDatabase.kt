@@ -5,15 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.fariyafardinfarhancollection.dao.ShopDao
-import com.example.fariyafardinfarhancollection.model.ProductCount
-import com.example.fariyafardinfarhancollection.model.SaleToday
-import com.example.fariyafardinfarhancollection.model.WholesaleCount
+import com.example.fariyafardinfarhancollection.model.*
 
 @Database(
     entities = [
         ProductCount::class,
         WholesaleCount::class,
-        SaleToday::class
+        SaleToday::class,
+        OtherPaymentReceived::class,
+        SpentToday::class
     ],
     version = 1,
     exportSchema = false

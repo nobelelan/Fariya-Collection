@@ -70,8 +70,6 @@
             android:layout_width="match_parent"
             android:layout_height="500dp"
             android:layout_marginTop="4dp"
-            tools:listitem="@layout/rv_sales_product_count"
-            tools:itemCount="10"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -125,16 +123,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_wholesale_items"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="250dp"
             android:layout_marginTop="4dp"
-            tools:listitem="@layout/rv_sales_product_count"
-            tools:itemCount="5"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txt_wholesale_text"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintTop_toBottomOf="@+id/txt_wholesale_text" />
 
         <TextView
             android:id="@+id/txt_wholesale_total"
@@ -165,20 +159,126 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/rv_wholesale_items" />
 
+        <TextView
+            android:id="@+id/txt_other_payment_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/gilroy_bold"
+            android:text="OTHER PAYMENT"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_add_new_wholesale_item" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_other_payment"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_other_payment_text" />
+
+        <TextView
+            android:id="@+id/txt_other_payment_total"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/green"
+            android:fontFamily="@font/gilroy_bold"
+            android:text=" Total "
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/btn_add_new_other_payment"
+            app:layout_constraintTop_toBottomOf="@id/rv_other_payment" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_new_other_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/green"
+            android:text="+"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_other_payment" />
+
+        <TextView
+            android:id="@+id/txt_spent_amount_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/gilroy_bold"
+            android:text="SPENT TODAY"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_add_new_other_payment" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_spent_amount"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txt_spent_amount_text" />
+
+        <TextView
+            android:id="@+id/txt_spent_amount_total"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/green"
+            android:fontFamily="@font/gilroy_bold"
+            android:text=" Total "
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/btn_add_new_other_payment"
+            app:layout_constraintTop_toBottomOf="@id/rv_spent_amount" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_add_new_spent_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/green"
+            android:text="+"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_spent_amount" />
+
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btn_submit_data"
             android:layout_width="wrap_content"
             android:layout_height="25dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:background="@color/brown_light"
             android:text="SUBMIT"
             android:textAllCaps="false"
             android:textColor="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/txt_spent_amount_total"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_add_new_wholesale_item" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_sales"

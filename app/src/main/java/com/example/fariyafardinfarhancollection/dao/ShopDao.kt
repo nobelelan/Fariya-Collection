@@ -2,9 +2,7 @@ package com.example.fariyafardinfarhancollection.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.example.fariyafardinfarhancollection.model.ProductCount
-import com.example.fariyafardinfarhancollection.model.SaleToday
-import com.example.fariyafardinfarhancollection.model.WholesaleCount
+import com.example.fariyafardinfarhancollection.model.*
 
 @Dao
 interface ShopDao {
@@ -33,4 +31,22 @@ interface ShopDao {
     fun getAllSaleToday():LiveData<List<SaleToday>>
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertSaleToday(saleToday: SaleToday)
+
+    @Query("SELECT * FROM other_payment_received_table")
+    fun getAllOtherPaymentReceived(): LiveData<List<OtherPaymentReceived>>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived)
+    @Update
+    suspend fun updateOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived)
+    @Delete
+    suspend fun deleteOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived)
+
+    @Query("SELECT * FROM spent_today_table")
+    fun getAllSpentToday(): LiveData<List<SpentToday>>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertSpentToday(SpentToday: SpentToday)
+    @Update
+    suspend fun updateSpentToday(spentToday: SpentToday)
+    @Delete
+    suspend fun deleteSpentToday(spentToday: SpentToday)
 }

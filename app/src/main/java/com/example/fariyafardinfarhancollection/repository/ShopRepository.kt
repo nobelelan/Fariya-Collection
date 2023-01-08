@@ -3,9 +3,7 @@ package com.example.fariyafardinfarhancollection.repository
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.fariyafardinfarhancollection.dao.ShopDao
-import com.example.fariyafardinfarhancollection.model.ProductCount
-import com.example.fariyafardinfarhancollection.model.SaleToday
-import com.example.fariyafardinfarhancollection.model.WholesaleCount
+import com.example.fariyafardinfarhancollection.model.*
 
 class ShopRepository(
     private val shopDao: ShopDao
@@ -24,4 +22,14 @@ class ShopRepository(
 
     fun getAllSaleToday() = shopDao.getAllSaleToday()
     suspend fun insertSaleToday(saleToday: SaleToday) = shopDao.insertSaleToday(saleToday)
+
+    fun getAllOtherPaymentReceived() = shopDao.getAllOtherPaymentReceived()
+    suspend fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.insertOtherPaymentReceived(otherPaymentReceived)
+    suspend fun updateOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.updateOtherPaymentReceived(otherPaymentReceived)
+    suspend fun deleteOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.deleteOtherPaymentReceived(otherPaymentReceived)
+
+    fun getAllSpentToday() = shopDao.getAllSpentToday()
+    suspend fun insertSpentToday(spentToday: SpentToday) = shopDao.insertSpentToday(spentToday)
+    suspend fun updateSpentToday(spentToday: SpentToday) = shopDao.updateSpentToday(spentToday)
+    suspend fun deleteSpentToday(spentToday: SpentToday) = shopDao.deleteSpentToday(spentToday)
 }
