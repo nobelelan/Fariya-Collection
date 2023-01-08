@@ -1,5 +1,10 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.sales
 
+import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -20,6 +25,9 @@ import com.example.fariyafardinfarhancollection.model.WholesaleCount
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
+import com.google.common.cache.Cache
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 class SaleFragment : Fragment() {
@@ -52,6 +60,7 @@ class SaleFragment : Fragment() {
         setUpRetailSalesRecyclerView()
         setUpWholeSaleRecyclerView()
         setUpSalesRecyclerView()
+        setUpCurrentDate()
 
         shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
             salesProductCountAdapter.differ.submitList(it)
@@ -83,6 +92,34 @@ class SaleFragment : Fragment() {
 
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun setUpCurrentDate() {
+        val sharedPref = this.activity?.getSharedPreferences("datePicker", MODE_PRIVATE)
+        val editor = sharedPref?.edit()
+
+        val calender = Calendar.getInstance()
+        val year = calender.get(Calendar.YEAR)
+        val month = calender.get(Calendar.MONTH)
+        val day = calender.get(Calendar.DAY_OF_MONTH)
+        editor?.putString("currentDate"," $day/${month + 1}/$year ")
+
+        val currentDate = sharedPref?.getString("currentDate", "Date update required")
+        val selectedDate = sharedPref?.getString("selectedDate", "Date update required")
+        if (currentDate != selectedDate){
+            binding.txtCurrentDate.text = selectedDate
+        }else{
+            binding.txtCurrentDate.text = " $day/${month + 1}/$year "
+        }
+
+        binding.txtCurrentDateUpdate.setOnClickListener {
+            DatePickerDialog(requireContext(), DatePickerDialog.OnDateSetListener{view, mYear, mMonth, mDay ->
+                binding.txtCurrentDate.text = " $mDay/${mMonth + 1}/$mYear "
+                editor?.putString("selectedDate", " $mDay/${mMonth + 1}/$mYear ")
+                editor?.apply()
+            },year, month, day).show()
+        }
+    }
+
     private fun setTotalWholesale() {
         val totalWholesale = arrayListOf<Int>()
         shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
@@ -112,13 +149,21 @@ class SaleFragment : Fragment() {
                     wholesale = it
                 }
             })
+            var retailSaleText = ""
+            retailSale.forEach {
+                retailSaleText += "${it.pcId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+            }
+            var wholesaleText = ""
+            wholesale.forEach {
+                wholesaleText += "${it.wsId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+            }
             shopViewModel.insertSaleToday(SaleToday(
                 saleId = 0,
-                date = "default date",
-                retailSale = retailSale.toString(),
-                wholesale = wholesale.toString(),
-                wholesaleTotal = binding.txtWholesaleTotal.text.toString(),
-                retailTotal = binding.txtRetailTotal.text.toString()
+                date = binding.txtCurrentDate.text.toString(),
+                retailSale = retailSaleText,
+                wholesale = wholesaleText,
+                wholesaleTotal = " Wholesale Total = ${binding.txtWholesaleTotal.text} ",
+                retailTotal = " Retail Total = ${binding.txtRetailTotal.text} "
             ))
         }
     }
@@ -158,6 +203,7 @@ class SaleFragment : Fragment() {
         rvRetailItems.adapter = salesProductCountAdapter
         rvRetailItems.layoutManager = LinearLayoutManager(requireContext())
 
+        // TODO: check this out later if possible reduce this code in to forech, will work probably if id set to 0
         val productCount1 = ProductCount(1)
         val productCount2 = ProductCount(2)
         val productCount3 = ProductCount(3)
@@ -168,11 +214,9 @@ class SaleFragment : Fragment() {
         val productCount8 = ProductCount(8)
         val productCount9 = ProductCount(9)
         val productCount10 = ProductCount(10)
-        val productCount11 = ProductCount(11)
-        val productCount12 = ProductCount(12)
 
         val emptyProductCount = arrayListOf(productCount1, productCount2, productCount3, productCount4, productCount5,
-            productCount6, productCount7, productCount8, productCount9, productCount10, productCount11, productCount12)
+            productCount6, productCount7, productCount8, productCount9, productCount10)
 
         emptyProductCount.forEach{
             shopViewModel.insertProductCount(it)

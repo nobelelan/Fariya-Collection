@@ -9,7 +9,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="12dp">
+        android:layout_margin="6dp">
         <TextView
             android:id="@+id/txt_data_text"
             android:layout_width="wrap_content"
@@ -42,11 +42,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/gilroy_bold"
-            android:text="Retail:"
+            android:text="RETAIL"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/txt_data_text" />
 
@@ -69,7 +68,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_retail_items"
             android:layout_width="match_parent"
-            android:layout_height="440dp"
+            android:layout_height="500dp"
             android:layout_marginTop="4dp"
             tools:listitem="@layout/rv_sales_product_count"
             tools:itemCount="10"
@@ -115,18 +114,18 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:fontFamily="@font/gilroy_bold"
-            android:text="Wholesale :"
+            android:text="WHOLESALE"
             android:textColor="@color/black"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/btn_add_new_product_item" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_wholesale_items"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="300dp"
             android:layout_marginTop="4dp"
             tools:listitem="@layout/rv_sales_product_count"
             tools:itemCount="5"
