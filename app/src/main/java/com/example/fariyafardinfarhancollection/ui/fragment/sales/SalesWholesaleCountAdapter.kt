@@ -22,7 +22,7 @@ class SalesWholesaleCountAdapter :
 
     val differCallBack = object : DiffUtil.ItemCallback<WholesaleCount>() {
         override fun areItemsTheSame(oldItem: WholesaleCount, newItem: WholesaleCount): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.wsId == newItem.wsId
         }
 
         override fun areContentsTheSame(oldItem: WholesaleCount, newItem: WholesaleCount): Boolean {
@@ -46,7 +46,7 @@ class SalesWholesaleCountAdapter :
     override fun onBindViewHolder(holder: SalesProductCountViewHolder, position: Int) {
         val wholesaleCount = differ.currentList[position]
 
-        holder.binding.txtSerialNo.text = " ${wholesaleCount.id} "
+        holder.binding.txtSerialNo.text = " ${wholesaleCount.wsId} "
 
         holder.binding.edtProductName.setText(wholesaleCount.name)
         holder.binding.edtQuantity.setText(wholesaleCount.quantity)
@@ -59,7 +59,7 @@ class SalesWholesaleCountAdapter :
             val price = holder.binding.edtPrice.text.toString()
             if (verifyProductCountDataFromUser(name, quantity, price)){
                 val total = quantity.toInt() * price.toInt()
-                updateItemListener?.updateProductCount(wholesaleCount.id, name, quantity, price, total.toString())
+                updateItemListener?.updateProductCount(wholesaleCount.wsId, name, quantity, price, total.toString())
             }else{
                 Toast.makeText(holder.itemView.context, "Fill out all the fields!", Toast.LENGTH_SHORT).show()
             }

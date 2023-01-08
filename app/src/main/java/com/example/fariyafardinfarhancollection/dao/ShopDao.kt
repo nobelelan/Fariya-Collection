@@ -3,6 +3,7 @@ package com.example.fariyafardinfarhancollection.dao
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.fariyafardinfarhancollection.model.ProductCount
+import com.example.fariyafardinfarhancollection.model.SaleToday
 import com.example.fariyafardinfarhancollection.model.WholesaleCount
 
 @Dao
@@ -26,4 +27,10 @@ interface ShopDao {
     suspend fun updateWholesaleCount(wholesaleCount: WholesaleCount)
     @Delete
     suspend fun deleteWholesaleCount(wholesaleCount: WholesaleCount)
+
+
+    @Query("SELECT * FROM sale_today_table ORDER BY saleId DESC")
+    fun getAllSaleToday():LiveData<List<SaleToday>>
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insertSaleToday(saleToday: SaleToday)
 }

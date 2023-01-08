@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.model.ProductCount
+import com.example.fariyafardinfarhancollection.model.SaleToday
 import com.example.fariyafardinfarhancollection.model.WholesaleCount
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import kotlinx.coroutines.launch
@@ -18,42 +19,51 @@ class ShopViewModel(
     private val shopDao = ShopDatabase.getDatabase(application).shopDao()
     val getAllProductCount: LiveData<List<ProductCount>>
     val getAllWholesaleCount: LiveData<List<WholesaleCount>>
+    val getAllSaleToday: LiveData<List<SaleToday>>
 
     init {
         shopRepository = ShopRepository(shopDao)
         getAllProductCount = shopRepository.getAllProductCount()
         getAllWholesaleCount = shopRepository.getAllWholesaleCount()
+        getAllSaleToday = shopRepository.getAllSaleToday()
     }
     fun insertProductCount(productCount: ProductCount){
         viewModelScope.launch {
-            shopDao.insertProductCount(productCount)
+            shopRepository.insertProductCount(productCount)
         }
     }
     fun updateProductCount(productCount: ProductCount){
         viewModelScope.launch {
-            shopDao.updateProductCount(productCount)
+            shopRepository.updateProductCount(productCount)
         }
     }
     fun deleteProductCount(productCount: ProductCount){
         viewModelScope.launch {
-            shopDao.deleteProductCount(productCount)
+            shopRepository.deleteProductCount(productCount)
         }
     }
 
 
     fun insertWholesaleCount(wholesaleCount: WholesaleCount){
         viewModelScope.launch {
-            shopDao.insertWholesaleCount(wholesaleCount)
+            shopRepository.insertWholesaleCount(wholesaleCount)
         }
     }
     fun updateWholesaleCount(wholesaleCount: WholesaleCount){
         viewModelScope.launch {
-            shopDao.updateWholesaleCount(wholesaleCount)
+            shopRepository.updateWholesaleCount(wholesaleCount)
         }
     }
     fun deleteWholesaleCount(wholesaleCount: WholesaleCount){
         viewModelScope.launch {
-            shopDao.deleteWholesaleCount(wholesaleCount)
+            shopRepository.deleteWholesaleCount(wholesaleCount)
+        }
+    }
+
+
+    fun insertSaleToday(saleToday: SaleToday){
+        viewModelScope.launch {
+            shopRepository.insertSaleToday(saleToday)
         }
     }
 }

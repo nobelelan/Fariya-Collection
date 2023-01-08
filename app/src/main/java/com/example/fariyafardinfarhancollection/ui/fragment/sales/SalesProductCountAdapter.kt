@@ -21,7 +21,7 @@ class SalesProductCountAdapter :
 
     val differCallBack = object : DiffUtil.ItemCallback<ProductCount>() {
         override fun areItemsTheSame(oldItem: ProductCount, newItem: ProductCount): Boolean {
-            return oldItem.id == newItem.id
+            return oldItem.pcId == newItem.pcId
         }
 
         override fun areContentsTheSame(oldItem: ProductCount, newItem: ProductCount): Boolean {
@@ -45,7 +45,7 @@ class SalesProductCountAdapter :
     override fun onBindViewHolder(holder: SalesProductCountViewHolder, position: Int) {
         val productCount = differ.currentList[position]
 
-        holder.binding.txtSerialNo.text = " ${productCount.id} "
+        holder.binding.txtSerialNo.text = " ${productCount.pcId} "
 
         holder.binding.edtProductName.setText(productCount.name)
         holder.binding.edtQuantity.setText(productCount.quantity)
@@ -58,7 +58,7 @@ class SalesProductCountAdapter :
             val price = holder.binding.edtPrice.text.toString()
             if (verifyProductCountDataFromUser(name, quantity, price)){
                 val total = quantity.toInt() * price.toInt()
-                updateItemListener?.updateProductCount(productCount.id, name, quantity, price, total.toString())
+                updateItemListener?.updateProductCount(productCount.pcId, name, quantity, price, total.toString())
             }else{
                 Toast.makeText(holder.itemView.context, "Fill out all the fields!", Toast.LENGTH_SHORT).show()
             }

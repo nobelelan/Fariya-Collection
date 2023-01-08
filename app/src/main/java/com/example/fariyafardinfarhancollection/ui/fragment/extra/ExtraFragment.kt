@@ -6,9 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fariyafardinfarhancollection.R
+import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentExtraBinding
+import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.ui.LoginActivity
+import com.example.fariyafardinfarhancollection.ui.fragment.sales.SalesAdapter
+import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
+import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase

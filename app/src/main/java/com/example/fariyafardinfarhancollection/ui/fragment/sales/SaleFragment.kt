@@ -15,6 +15,7 @@ import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentSaleBinding
 import com.example.fariyafardinfarhancollection.model.ProductCount
+import com.example.fariyafardinfarhancollection.model.SaleToday
 import com.example.fariyafardinfarhancollection.model.WholesaleCount
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
@@ -28,6 +29,7 @@ class SaleFragment : Fragment() {
 
     private val salesProductCountAdapter by lazy { SalesProductCountAdapter() }
     private val salesWholesaleCountAdapter by lazy { SalesWholesaleCountAdapter() }
+    private val salesAdapter by lazy { SalesAdapter() }
     private lateinit var shopViewModel: ShopViewModel
 
     override fun onCreateView(
@@ -49,12 +51,16 @@ class SaleFragment : Fragment() {
 
         setUpRetailSalesRecyclerView()
         setUpWholeSaleRecyclerView()
+        setUpSalesRecyclerView()
 
         shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
             salesProductCountAdapter.differ.submitList(it)
         })
         shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
             salesWholesaleCountAdapter.differ.submitList(it)
+        })
+        shopViewModel.getAllSaleToday.observe(viewLifecycleOwner, Observer {
+            salesAdapter.differ.submitList(it)
         })
 
         salesProductCountAdapter.setUpdateItemListener(object : SalesProductCountAdapter.UpdateItemListener{
@@ -85,6 +91,36 @@ class SaleFragment : Fragment() {
             }
         })
         binding.txtWholesaleTotal.text = totalWholesale.sum().toString()
+    }
+
+
+    private fun setUpSalesRecyclerView() {
+        val rvSales = binding.rvSales
+        rvSales.adapter = salesAdapter
+        rvSales.layoutManager = LinearLayoutManager(requireContext())
+
+        binding.btnSubmitData.setOnClickListener {
+            var retailSale = listOf<ProductCount>()
+            var wholesale = listOf<WholesaleCount>()
+            shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    retailSale = it
+                }
+            })
+            shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    wholesale = it
+                }
+            })
+            shopViewModel.insertSaleToday(SaleToday(
+                saleId = 0,
+                date = "default date",
+                retailSale = retailSale.toString(),
+                wholesale = wholesale.toString(),
+                wholesaleTotal = binding.txtWholesaleTotal.text.toString(),
+                retailTotal = binding.txtRetailTotal.text.toString()
+            ))
+        }
     }
 
     private fun setUpWholeSaleRecyclerView() {
