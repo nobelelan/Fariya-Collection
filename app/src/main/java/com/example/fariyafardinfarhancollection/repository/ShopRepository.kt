@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.fariyafardinfarhancollection.dao.ShopDao
 import com.example.fariyafardinfarhancollection.model.ProductCount
+import com.example.fariyafardinfarhancollection.model.WholesaleCount
 
 class ShopRepository(
     private val shopDao: ShopDao
@@ -13,4 +14,9 @@ class ShopRepository(
     suspend fun insertProductCount(productCount: ProductCount) = shopDao.insertProductCount(productCount)
     suspend fun updateProductCount(productCount: ProductCount) = shopDao.updateProductCount(productCount)
     suspend fun deleteProductCount(productCount: ProductCount) = shopDao.deleteProductCount(productCount)
+
+    fun getAllWholesaleCount() = shopDao.getAllWholesaleCount()
+    suspend fun insertWholesaleCount(wholesaleCount: WholesaleCount) = shopDao.insertWholesaleCount(wholesaleCount)
+    suspend fun updateWholesaleCount(wholesaleCount: WholesaleCount) = shopDao.updateWholesaleCount(wholesaleCount)
+    suspend fun deleteWholesaleCount(wholesaleCount: WholesaleCount) = shopDao.deleteWholesaleCount(wholesaleCount)
 }

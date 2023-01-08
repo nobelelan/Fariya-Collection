@@ -6,8 +6,13 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.fariyafardinfarhancollection.dao.ShopDao
 import com.example.fariyafardinfarhancollection.model.ProductCount
+import com.example.fariyafardinfarhancollection.model.WholesaleCount
 
-@Database(entities = [ProductCount::class], version = 1, exportSchema = false)
+@Database(
+    entities = [ProductCount::class, WholesaleCount::class],
+    version = 1,
+    exportSchema = false
+)
 abstract class ShopDatabase: RoomDatabase(){
 
     abstract fun shopDao(): ShopDao
