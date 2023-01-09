@@ -49,6 +49,7 @@ class SaleFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_sale, container, false)
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSaleBinding.bind(view)
@@ -114,9 +115,19 @@ class SaleFragment : Fragment() {
         binding.txtSpentAmountTotal.setOnClickListener {
             setTotalSpentToday()
         }
+        binding.txtRetailTotalAfterMinusSpentToday.setOnClickListener {
+            if (binding.txtRetailTotal.text.toString() != " Total " && binding.txtSpentAmountTotal.text.toString() != " Total "){
+                val spentAmount = binding.txtSpentAmountTotal.text.toString().toInt()
+                val retailTotal = binding.txtRetailTotal.text.toString().toInt()
+                binding.txtRetailTotalAfterMinusSpentToday.text = " ${retailTotal - spentAmount} "
+            }else{
+                Toast.makeText(requireContext(), "Calculate both totals first!", Toast.LENGTH_SHORT).show()
+            }
+        }
 
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setTotalSpentToday() {
         val totalSpentToday = arrayListOf<Int>()
         shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
@@ -127,6 +138,7 @@ class SaleFragment : Fragment() {
         binding.txtSpentAmountTotal.text = totalSpentToday.sum().toString()
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setTotalOtherPayment() {
         val totalOtherPaymentReceived = arrayListOf<Int>()
         shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
@@ -201,6 +213,7 @@ class SaleFragment : Fragment() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setTotalWholesale() {
         val totalWholesale = arrayListOf<Int>()
         shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
