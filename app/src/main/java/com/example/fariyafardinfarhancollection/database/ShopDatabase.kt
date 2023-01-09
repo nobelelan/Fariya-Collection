@@ -13,7 +13,8 @@ import com.example.fariyafardinfarhancollection.model.*
         WholesaleCount::class,
         SaleToday::class,
         OtherPaymentReceived::class,
-        SpentToday::class
+        SpentToday::class,
+        CustomerContact::class
     ],
     version = 1,
     exportSchema = false

@@ -49,4 +49,13 @@ interface ShopDao {
     suspend fun updateSpentToday(spentToday: SpentToday)
     @Delete
     suspend fun deleteSpentToday(spentToday: SpentToday)
+
+    @Query("SELECT * FROM customer_contact_table ORDER BY ccId DESC")
+    fun getAllCustomerContacts(): LiveData<List<CustomerContact>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertCustomerContact(customerContact: CustomerContact)
+    @Update
+    suspend fun updateCustomerContact(customerContact: CustomerContact)
+    @Delete
+    suspend fun deleteCustomerContact(customerContact: CustomerContact)
 }

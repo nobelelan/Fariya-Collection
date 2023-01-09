@@ -20,6 +20,7 @@ class ShopViewModel(
     val getAllSaleToday: LiveData<List<SaleToday>>
     val getAllOtherPaymentReceived: LiveData<List<OtherPaymentReceived>>
     val getAllSpentToday: LiveData<List<SpentToday>>
+    val getAllCustomerContacts: LiveData<List<CustomerContact>>
 
     init {
         shopRepository = ShopRepository(shopDao)
@@ -28,6 +29,7 @@ class ShopViewModel(
         getAllSaleToday = shopRepository.getAllSaleToday()
         getAllOtherPaymentReceived = shopRepository.getAllOtherPaymentReceived()
         getAllSpentToday = shopRepository.getAllSpentToday()
+        getAllCustomerContacts = shopRepository.getAllCustomerContacts()
     }
     fun insertProductCount(productCount: ProductCount){
         viewModelScope.launch {
@@ -100,6 +102,22 @@ class ShopViewModel(
     fun deleteSpentToday(spentToday: SpentToday){
         viewModelScope.launch {
             shopRepository.deleteSpentToday(spentToday)
+        }
+    }
+
+    fun insertCustomerContact(customerContact: CustomerContact){
+        viewModelScope.launch {
+            shopRepository.insertCustomerContact(customerContact)
+        }
+    }
+    fun updateCustomerContact(customerContact: CustomerContact){
+        viewModelScope.launch {
+            shopRepository.updateCustomerContact(customerContact)
+        }
+    }
+    fun deleteCustomerContact(customerContact: CustomerContact){
+        viewModelScope.launch {
+            shopRepository.deleteCustomerContact(customerContact)
         }
     }
 }

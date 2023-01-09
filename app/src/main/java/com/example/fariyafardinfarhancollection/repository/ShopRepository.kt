@@ -32,4 +32,9 @@ class ShopRepository(
     suspend fun insertSpentToday(spentToday: SpentToday) = shopDao.insertSpentToday(spentToday)
     suspend fun updateSpentToday(spentToday: SpentToday) = shopDao.updateSpentToday(spentToday)
     suspend fun deleteSpentToday(spentToday: SpentToday) = shopDao.deleteSpentToday(spentToday)
+
+    fun getAllCustomerContacts() = shopDao.getAllCustomerContacts()
+    suspend fun insertCustomerContact(customerContact: CustomerContact) = shopDao.insertCustomerContact(customerContact)
+    suspend fun updateCustomerContact(customerContact: CustomerContact) = shopDao.updateCustomerContact(customerContact)
+    suspend fun deleteCustomerContact(customerContact: CustomerContact) = shopDao.deleteCustomerContact(customerContact)
 }

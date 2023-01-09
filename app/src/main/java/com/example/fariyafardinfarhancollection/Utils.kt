@@ -11,3 +11,9 @@ fun verifyLoginDataFromUser(email: String, password: String): Boolean{
 fun verifyProductCountDataFromUser(name: String, quantity: String, price: String): Boolean{
     return (name.isNotEmpty() && quantity.isNotEmpty() && price.isNotEmpty() )
 }
+
+fun verifyCustomerInformation(name: String, phone: String, address: String, due: String): Boolean{
+    return (name.isNotEmpty() && phone.isNotEmpty() && address.isNotEmpty() && due.isNotEmpty()) ||
+            (name.isNotEmpty() && due.isNotEmpty()) || (phone.isNotEmpty() && due.isNotEmpty()) ||
+            name.isNotEmpty() && phone.isNotEmpty()
+}
