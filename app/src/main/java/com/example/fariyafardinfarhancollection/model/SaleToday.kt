@@ -10,6 +10,12 @@ data class SaleToday(
     var date: String? = null,
     var retailSale: String? = null,
     var wholesale: String? = null,
+    var otherPayment: String? = null,
+    var spentToday: String? = null,
+    var retailTotal: String? = null,
     var wholesaleTotal: String? = null,
-    var retailTotal: String? = null
+    var otherPaymentTotal: String? = null,
+    var spentTodayTotal: String? = null,
+    var comment: String? = null,
+    var retailAfterSpentMinus: String? = null
 )

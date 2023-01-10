@@ -233,6 +233,8 @@ class SaleFragment : Fragment() {
         binding.btnSubmitData.setOnClickListener {
             var retailSale = listOf<ProductCount>()
             var wholesale = listOf<WholesaleCount>()
+            var otherPayment = listOf<OtherPaymentReceived>()
+            var spentToday = listOf<SpentToday>()
             shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
                 it?.let {
                     retailSale = it
@@ -243,6 +245,16 @@ class SaleFragment : Fragment() {
                     wholesale = it
                 }
             })
+            shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    otherPayment = it
+                }
+            })
+            shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+                it?.let {
+                    spentToday = it
+                }
+            })
             var retailSaleText = ""
             retailSale.forEach {
                 retailSaleText += "${it.pcId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
@@ -251,13 +263,27 @@ class SaleFragment : Fragment() {
             wholesale.forEach {
                 wholesaleText += "${it.wsId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
             }
+            var otherPaymentText = ""
+            otherPayment.forEach {
+                otherPaymentText += "${it.otherPaymentId}    ${it.senderName}    ${it.paymentMethod}    =    ${it.amount}\n"
+            }
+            var spentTodayText = ""
+            spentToday.forEach {
+                spentTodayText += "${it.spentTodayId}    ${it.reason}    =    ${it.amount}\n"
+            }
             shopViewModel.insertSaleToday(SaleToday(
                 saleId = 0,
                 date = binding.txtCurrentDate.text.toString(),
                 retailSale = retailSaleText,
                 wholesale = wholesaleText,
                 wholesaleTotal = " Wholesale Total = ${binding.txtWholesaleTotal.text} ",
-                retailTotal = " Retail Total = ${binding.txtRetailTotal.text} "
+                retailTotal = " Retail Total = ${binding.txtRetailTotal.text} ",
+                otherPayment = otherPaymentText,
+                spentToday = spentTodayText,
+                otherPaymentTotal = " Other Payment Total = ${binding.txtOtherPaymentTotal.text}",
+                spentTodayTotal = " Spent Today Total = ${binding.txtSpentAmountTotal.text}",
+                comment = " Comment: \n ${binding.edtComment.text}",
+                retailAfterSpentMinus = " Retail Total After Subtracting Spent Money:\n =${binding.txtRetailTotalAfterMinusSpentToday.text}"
             ))
         }
     }
