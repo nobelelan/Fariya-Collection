@@ -74,6 +74,7 @@ class CustomerContactsFragment : Fragment() {
                 val customerDue = ccBinding.edtCustomerDue.text.toString().toIntOrNull()
                 if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue.toString())){
                     shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue))
+                    Toast.makeText(requireContext(), "Update Successfully!", Toast.LENGTH_SHORT).show()
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }
@@ -107,6 +108,7 @@ class CustomerContactsFragment : Fragment() {
                 val customerDue = ccBinding.edtCustomerDue.text.toString().toIntOrNull()
                 if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue.toString())){
                     shopViewModel.insertCustomerContact(CustomerContact(0, customerName, customerContact, customerAddress, customerDue))
+                    Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }

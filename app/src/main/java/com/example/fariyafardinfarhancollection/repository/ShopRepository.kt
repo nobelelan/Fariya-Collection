@@ -13,11 +13,13 @@ class ShopRepository(
     suspend fun insertProductCount(productCount: ProductCount) = shopDao.insertProductCount(productCount)
     suspend fun updateProductCount(productCount: ProductCount) = shopDao.updateProductCount(productCount)
     suspend fun deleteProductCount(productCount: ProductCount) = shopDao.deleteProductCount(productCount)
+    suspend fun deleteAllProductCount() = shopDao.deleteAllProductCount()
 
     fun getAllWholesaleCount() = shopDao.getAllWholesaleCount()
     suspend fun insertWholesaleCount(wholesaleCount: WholesaleCount) = shopDao.insertWholesaleCount(wholesaleCount)
     suspend fun updateWholesaleCount(wholesaleCount: WholesaleCount) = shopDao.updateWholesaleCount(wholesaleCount)
     suspend fun deleteWholesaleCount(wholesaleCount: WholesaleCount) = shopDao.deleteWholesaleCount(wholesaleCount)
+    suspend fun deleteAllWholesaleCount() = shopDao.deleteAllWholesaleCount()
 
 
     fun getAllSaleToday() = shopDao.getAllSaleToday()
@@ -27,11 +29,13 @@ class ShopRepository(
     suspend fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.insertOtherPaymentReceived(otherPaymentReceived)
     suspend fun updateOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.updateOtherPaymentReceived(otherPaymentReceived)
     suspend fun deleteOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.deleteOtherPaymentReceived(otherPaymentReceived)
+    suspend fun deleteAllOtherPaymentReceived() = shopDao.deleteAllOtherPaymentReceived()
 
     fun getAllSpentToday() = shopDao.getAllSpentToday()
     suspend fun insertSpentToday(spentToday: SpentToday) = shopDao.insertSpentToday(spentToday)
     suspend fun updateSpentToday(spentToday: SpentToday) = shopDao.updateSpentToday(spentToday)
     suspend fun deleteSpentToday(spentToday: SpentToday) = shopDao.deleteSpentToday(spentToday)
+    suspend fun deleteAllSpentToday() = shopDao.deleteAllSpentToday()
 
     fun getAllCustomerContacts() = shopDao.getAllCustomerContacts()
     suspend fun insertCustomerContact(customerContact: CustomerContact) = shopDao.insertCustomerContact(customerContact)

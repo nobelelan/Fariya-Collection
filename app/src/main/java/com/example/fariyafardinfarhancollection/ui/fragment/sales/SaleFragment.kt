@@ -120,7 +120,24 @@ class SaleFragment : Fragment() {
         binding.btnPreviousSalesReports.setOnClickListener {
             findNavController().navigate(R.id.action_saleFragment_to_recordsFragment)
         }
-        
+
+        binding.txtReset.setOnClickListener {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setMessage("This will remove all of your current data.")
+            builder.setNegativeButton("Cancel"){_,_->}
+            builder.setPositiveButton("Continue"){_,_->
+                shopViewModel.apply {
+                    Toast.makeText(requireContext(), "Reset Successful!", Toast.LENGTH_SHORT).show()
+                    deleteAllProductCount()
+                    deleteAllWholesaleCount()
+                    deleteAllOtherPaymentReceived()
+                    deleteAllSpentToday()
+                    activity?.onBackPressed()
+                }
+            }
+            builder.create().show()
+
+        }
 
     }
 
@@ -283,6 +300,7 @@ class SaleFragment : Fragment() {
                     comment = " Comment: \n ${binding.edtComment.text}",
                     retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
                 ))
+                Toast.makeText(requireContext(), "Record Saved Successfully!", Toast.LENGTH_SHORT).show()
             }
             builder.create().show()
         }

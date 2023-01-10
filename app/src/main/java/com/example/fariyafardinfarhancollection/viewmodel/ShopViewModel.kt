@@ -46,6 +46,11 @@ class ShopViewModel(
             shopRepository.deleteProductCount(productCount)
         }
     }
+    fun deleteAllProductCount(){
+        viewModelScope.launch {
+            shopRepository.deleteAllProductCount()
+        }
+    }
 
 
     fun insertWholesaleCount(wholesaleCount: WholesaleCount){
@@ -61,6 +66,11 @@ class ShopViewModel(
     fun deleteWholesaleCount(wholesaleCount: WholesaleCount){
         viewModelScope.launch {
             shopRepository.deleteWholesaleCount(wholesaleCount)
+        }
+    }
+    fun deleteAllWholesaleCount(){
+        viewModelScope.launch {
+            shopRepository.deleteAllWholesaleCount()
         }
     }
 
@@ -87,6 +97,11 @@ class ShopViewModel(
             shopRepository.deleteOtherPaymentReceived(otherPaymentReceived)
         }
     }
+    fun deleteAllOtherPaymentReceived(){
+        viewModelScope.launch {
+            shopRepository.deleteAllOtherPaymentReceived()
+        }
+    }
 
 
     fun insertSpentToday(spentToday: SpentToday){
@@ -102,6 +117,11 @@ class ShopViewModel(
     fun deleteSpentToday(spentToday: SpentToday){
         viewModelScope.launch {
             shopRepository.deleteSpentToday(spentToday)
+        }
+    }
+    fun deleteAllSpentToday(){
+        viewModelScope.launch {
+            shopRepository.deleteAllSpentToday()
         }
     }
 

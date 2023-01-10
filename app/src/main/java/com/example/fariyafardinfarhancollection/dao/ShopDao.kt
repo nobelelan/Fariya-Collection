@@ -15,6 +15,8 @@ interface ShopDao {
     suspend fun updateProductCount(productCount: ProductCount)
     @Delete
     suspend fun deleteProductCount(productCount: ProductCount)
+    @Query("DELETE FROM product_count_table")
+    suspend fun deleteAllProductCount()
 
 
     @Query("SELECT * FROM wholesale_count_table")
@@ -25,7 +27,8 @@ interface ShopDao {
     suspend fun updateWholesaleCount(wholesaleCount: WholesaleCount)
     @Delete
     suspend fun deleteWholesaleCount(wholesaleCount: WholesaleCount)
-
+    @Query("DELETE FROM wholesale_count_table")
+    suspend fun deleteAllWholesaleCount()
 
     @Query("SELECT * FROM sale_today_table ORDER BY saleId DESC")
     fun getAllSaleToday():LiveData<List<SaleToday>>
@@ -40,6 +43,8 @@ interface ShopDao {
     suspend fun updateOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived)
     @Delete
     suspend fun deleteOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived)
+    @Query("DELETE FROM other_payment_received_table")
+    suspend fun deleteAllOtherPaymentReceived()
 
     @Query("SELECT * FROM spent_today_table")
     fun getAllSpentToday(): LiveData<List<SpentToday>>
@@ -49,6 +54,8 @@ interface ShopDao {
     suspend fun updateSpentToday(spentToday: SpentToday)
     @Delete
     suspend fun deleteSpentToday(spentToday: SpentToday)
+    @Query("DELETE FROM spent_today_table")
+    suspend fun deleteAllSpentToday()
 
     @Query("SELECT * FROM customer_contact_table ORDER BY ccId DESC")
     fun getAllCustomerContacts(): LiveData<List<CustomerContact>>
