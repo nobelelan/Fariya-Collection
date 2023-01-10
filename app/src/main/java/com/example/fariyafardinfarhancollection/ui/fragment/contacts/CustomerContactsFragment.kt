@@ -1,6 +1,8 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.contacts
 
 import android.app.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -52,7 +54,7 @@ class CustomerContactsFragment : Fragment() {
             customerContactAdapter.differ.submitList(it)
         })
 
-        customerContactAdapter.setOnItemClickListener {
+        customerContactAdapter.setOnEditClickListener {
             val inflater = LayoutInflater.from(requireContext())
             val ccBinding = DialogUpsertCustomerContactBinding.inflate(inflater)
 
@@ -78,6 +80,12 @@ class CustomerContactsFragment : Fragment() {
             }
             builder.create().show()
         }
+        customerContactAdapter.setMakeCallClickListener(object :CustomerContactAdapter.ClickListener{
+            override fun onMakeCallClick(customerNumber: String) {
+                val intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", customerNumber, null))
+                activity?.startActivity(intent)
+            }
+        })
     }
 
     private fun setUpCustomerContactsRecyclerView() {

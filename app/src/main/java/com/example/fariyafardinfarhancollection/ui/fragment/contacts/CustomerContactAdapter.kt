@@ -37,17 +37,29 @@ class CustomerContactAdapter: RecyclerView.Adapter<CustomerContactAdapter.Custom
             txtCustomerAddress.text = customerContact.address
             txtCustomerDue.text = customerContact.due.toString()
         }
-        holder.itemView.setOnClickListener {
-            onItemClickListener?.let { it(customerContact) }
+        holder.binding.imgEdit.setOnClickListener {
+            onEditItemClickListener?.let { it(customerContact) }
+        }
+        holder.binding.imgMakeCall.setOnClickListener {
+            customerContact?.let {
+                makeCallClickListener?.onMakeCallClick(it.number.toString())
+            }
         }
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
+    private var makeCallClickListener: ClickListener? = null
+    interface ClickListener{
+        fun onMakeCallClick(customerNumber: String)
+    }
+    fun setMakeCallClickListener(listener: ClickListener){
+        makeCallClickListener = listener
+    }
 
-    private var onItemClickListener: ((CustomerContact)->Unit) ?= null
-    fun setOnItemClickListener(listener: (CustomerContact)->Unit){
-        onItemClickListener = listener
+    private var onEditItemClickListener: ((CustomerContact)->Unit) ?= null
+    fun setOnEditClickListener(listener: (CustomerContact)->Unit){
+        onEditItemClickListener = listener
     }
 }

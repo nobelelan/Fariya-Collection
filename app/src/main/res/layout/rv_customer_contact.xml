@@ -14,6 +14,7 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:fontFamily="@font/gilroy_bold"
+        android:textIsSelectable="true"
         android:maxLength="32"
         android:maxLines="1"
         android:text="Customer Name"
@@ -31,10 +32,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/gilroy_light"
+        android:textIsSelectable="true"
         android:maxLength="32"
         android:maxLines="1"
         android:text="Phone Number"
         android:textColor="@color/black"
+        android:textStyle="bold"
         android:textSize="14sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -47,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/gilroy_light"
+        android:textIsSelectable="true"
         android:maxLength="32"
         android:maxLines="1"
         android:text="Address: "
@@ -61,6 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:fontFamily="@font/gilroy_light"
+        android:textIsSelectable="true"
         android:maxLength="32"
         android:maxLines="1"
         android:textColor="@color/black"
@@ -77,6 +82,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:fontFamily="@font/gilroy_light"
+        android:textIsSelectable="true"
         android:maxLength="18"
         android:maxLines="1"
         android:text="Due: "
@@ -94,6 +100,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         android:fontFamily="@font/gilroy_light"
+        android:textIsSelectable="true"
         android:maxLength="18"
         android:maxLines="1"
         android:textColor="@color/black"
@@ -110,5 +117,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_make_call" />
+
+    <ImageView
+        android:id="@+id/img_edit"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/ic_edit" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
