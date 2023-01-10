@@ -4,18 +4,16 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.view.size
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentSaleBinding
@@ -23,8 +21,6 @@ import com.example.fariyafardinfarhancollection.model.*
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
-import com.google.common.cache.Cache
-import java.text.SimpleDateFormat
 import java.util.*
 
 
@@ -35,7 +31,6 @@ class SaleFragment : Fragment() {
 
     private val salesProductCountAdapter by lazy { SalesProductCountAdapter() }
     private val salesWholesaleCountAdapter by lazy { SalesWholesaleCountAdapter() }
-    private val salesAdapter by lazy { SalesAdapter() }
     private val otherPaymentReceivedAdapter by lazy { OtherPaymentReceivedAdapter() }
     private val spentTodayAdapter by lazy { SpentTodayAdapter() }
 
@@ -61,19 +56,16 @@ class SaleFragment : Fragment() {
 
         setUpRetailSalesRecyclerView()
         setUpWholeSaleRecyclerView()
-        setUpSalesRecyclerView()
         setUpOtherPaymentRecyclerView()
         setUpSpentTodayRecyclerView()
         setUpCurrentDate()
+        submitDataIntoSales()
 
         shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
             salesProductCountAdapter.differ.submitList(it)
         })
         shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
             salesWholesaleCountAdapter.differ.submitList(it)
-        })
-        shopViewModel.getAllSaleToday.observe(viewLifecycleOwner, Observer {
-            salesAdapter.differ.submitList(it)
         })
         shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
             otherPaymentReceivedAdapter.differ.submitList(it)
@@ -124,6 +116,11 @@ class SaleFragment : Fragment() {
                 Toast.makeText(requireContext(), "Calculate both totals first!", Toast.LENGTH_SHORT).show()
             }
         }
+
+        binding.btnPreviousSalesReports.setOnClickListener {
+            findNavController().navigate(R.id.action_saleFragment_to_recordsFragment)
+        }
+        
 
     }
 
@@ -225,66 +222,69 @@ class SaleFragment : Fragment() {
     }
 
 
-    private fun setUpSalesRecyclerView() {
-        val rvSales = binding.rvSales
-        rvSales.adapter = salesAdapter
-        rvSales.layoutManager = LinearLayoutManager(requireContext())
+    private fun submitDataIntoSales() {
 
         binding.btnSubmitData.setOnClickListener {
-            var retailSale = listOf<ProductCount>()
-            var wholesale = listOf<WholesaleCount>()
-            var otherPayment = listOf<OtherPaymentReceived>()
-            var spentToday = listOf<SpentToday>()
-            shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    retailSale = it
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Confirm Submission")
+            builder.setNegativeButton("Cancel"){_,_->}
+            builder.setPositiveButton("Submit"){_,_->
+                var retailSale = listOf<ProductCount>()
+                var wholesale = listOf<WholesaleCount>()
+                var otherPayment = listOf<OtherPaymentReceived>()
+                var spentToday = listOf<SpentToday>()
+                shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+                    it?.let {
+                        retailSale = it
+                    }
+                })
+                shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
+                    it?.let {
+                        wholesale = it
+                    }
+                })
+                shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+                    it?.let {
+                        otherPayment = it
+                    }
+                })
+                shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+                    it?.let {
+                        spentToday = it
+                    }
+                })
+                var retailSaleText = ""
+                retailSale.forEach {
+                    retailSaleText += "${it.pcId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
                 }
-            })
-            shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    wholesale = it
+                var wholesaleText = ""
+                wholesale.forEach {
+                    wholesaleText += "${it.wsId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
                 }
-            })
-            shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    otherPayment = it
+                var otherPaymentText = ""
+                otherPayment.forEach {
+                    otherPaymentText += "${it.otherPaymentId}    ${it.senderName}    (${it.paymentMethod})    =    ${it.amount}\n"
                 }
-            })
-            shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
-                it?.let {
-                    spentToday = it
+                var spentTodayText = ""
+                spentToday.forEach {
+                    spentTodayText += "${it.spentTodayId}    ${it.reason}    =    ${it.amount}\n"
                 }
-            })
-            var retailSaleText = ""
-            retailSale.forEach {
-                retailSaleText += "${it.pcId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                shopViewModel.insertSaleToday(SaleToday(
+                    saleId = 0,
+                    date = binding.txtCurrentDate.text.toString(),
+                    retailSale = retailSaleText,
+                    wholesale = wholesaleText,
+                    wholesaleTotal = " = ${binding.txtWholesaleTotal.text} ",
+                    retailTotal = " = ${binding.txtRetailTotal.text} ",
+                    otherPayment = otherPaymentText,
+                    spentToday = spentTodayText,
+                    otherPaymentTotal = " = ${binding.txtOtherPaymentTotal.text} ",
+                    spentTodayTotal = " = ${binding.txtSpentAmountTotal.text} ",
+                    comment = " Comment: \n ${binding.edtComment.text}",
+                    retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
+                ))
             }
-            var wholesaleText = ""
-            wholesale.forEach {
-                wholesaleText += "${it.wsId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
-            }
-            var otherPaymentText = ""
-            otherPayment.forEach {
-                otherPaymentText += "${it.otherPaymentId}    ${it.senderName}    ${it.paymentMethod}    =    ${it.amount}\n"
-            }
-            var spentTodayText = ""
-            spentToday.forEach {
-                spentTodayText += "${it.spentTodayId}    ${it.reason}    =    ${it.amount}\n"
-            }
-            shopViewModel.insertSaleToday(SaleToday(
-                saleId = 0,
-                date = binding.txtCurrentDate.text.toString(),
-                retailSale = retailSaleText,
-                wholesale = wholesaleText,
-                wholesaleTotal = " Wholesale Total = ${binding.txtWholesaleTotal.text} ",
-                retailTotal = " Retail Total = ${binding.txtRetailTotal.text} ",
-                otherPayment = otherPaymentText,
-                spentToday = spentTodayText,
-                otherPaymentTotal = " Other Payment Total = ${binding.txtOtherPaymentTotal.text}",
-                spentTodayTotal = " Spent Today Total = ${binding.txtSpentAmountTotal.text}",
-                comment = " Comment: \n ${binding.edtComment.text}",
-                retailAfterSpentMinus = " Retail Total After Subtracting Spent Money:\n =${binding.txtRetailTotalAfterMinusSpentToday.text}"
-            ))
+            builder.create().show()
         }
     }
 

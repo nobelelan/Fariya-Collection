@@ -9,5 +9,14 @@
         android:id="@+id/saleFragment"
         android:name="com.example.fariyafardinfarhancollection.ui.fragment.sales.SaleFragment"
         android:label="Sales"
-        tools:layout="@layout/fragment_sale" />
+        tools:layout="@layout/fragment_sale" >
+        <action
+            android:id="@+id/action_saleFragment_to_recordsFragment"
+            app:destination="@id/recordsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/recordsFragment"
+        android:name="com.example.fariyafardinfarhancollection.ui.fragment.sales.RecordsFragment"
+        android:label="fragment_records"
+        tools:layout="@layout/fragment_records" />
 </navigation>

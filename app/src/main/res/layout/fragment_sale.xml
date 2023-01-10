@@ -65,6 +65,18 @@
             app:layout_constraintStart_toEndOf="@+id/txt_current_date"
             app:layout_constraintTop_toTopOf="@+id/txt_current_date" />
 
+        <TextView
+            android:id="@+id/txt_reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@color/red"
+            android:fontFamily="@font/gilroy_bold"
+            android:text=" Reset "
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_retail_items"
             android:layout_width="match_parent"
@@ -85,7 +97,7 @@
             android:fontFamily="@font/gilroy_bold"
             android:gravity="center"
             android:text=" Total "
-            android:textColor="@color/black"
+            android:textColor="@color/green"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -137,7 +149,7 @@
             android:fontFamily="@font/gilroy_bold"
             android:text=" Total "
             android:gravity="center"
-            android:textColor="@color/black"
+            android:textColor="@color/green"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -189,7 +201,7 @@
             android:fontFamily="@font/gilroy_bold"
             android:text=" Total "
             android:gravity="center"
-            android:textColor="@color/black"
+            android:textColor="@color/green"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -241,7 +253,7 @@
             android:fontFamily="@font/gilroy_bold"
             android:text=" Total "
             android:gravity="center"
-            android:textColor="@color/black"
+            android:textColor="@color/green"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
@@ -253,7 +265,7 @@
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_marginTop="8dp"
-            android:background="@color/green"
+            android:background="@color/brown_dark"
             android:fontFamily="@font/gilroy_bold"
             android:gravity="center"
             android:text=" Calculate "
@@ -315,6 +327,7 @@
             android:layout_width="0dp"
             android:layout_height="25dp"
             android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:background="@color/brown_dark"
             android:text="View Previous Records"
             android:textAllCaps="false"
@@ -323,6 +336,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:layout_editor_absoluteY="357dp" />
 
         <EditText
@@ -341,14 +355,6 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:layout_editor_absoluteY="1371dp" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_sales"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_previous_sales_reports"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
