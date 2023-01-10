@@ -80,6 +80,11 @@ class ShopViewModel(
             shopRepository.insertSaleToday(saleToday)
         }
     }
+    fun deleteSaleToday(saleToday: SaleToday){
+        viewModelScope.launch {
+            shopRepository.deleteSaleToday(saleToday)
+        }
+    }
 
 
     fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived){

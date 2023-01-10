@@ -11,8 +11,11 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
+import com.example.fariyafardinfarhancollection.SwipeToDelete
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.DialogUpsertCustomerContactBinding
 import com.example.fariyafardinfarhancollection.databinding.FragmentCustomerContactsBinding
@@ -21,6 +24,7 @@ import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.verifyCustomerInformation
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
+import com.google.android.material.snackbar.Snackbar
 
 class CustomerContactsFragment : Fragment() {
 
@@ -93,6 +97,19 @@ class CustomerContactsFragment : Fragment() {
         val rvCustomerContact = binding.rvCustomerContact
         rvCustomerContact.adapter = customerContactAdapter
         rvCustomerContact.layoutManager = LinearLayoutManager(requireContext())
+
+        val swipeToDeleteCallback = object : SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
+                shopViewModel.deleteCustomerContact(tobeDeletedItem)
+                customerContactAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                Snackbar.make(viewHolder.itemView, "Contact Deleted!", Snackbar.LENGTH_LONG)
+                    .setAction("Undo"){ shopViewModel.insertCustomerContact(tobeDeletedItem) }
+                    .show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(rvCustomerContact)
 
         binding.fabAddContact.setOnClickListener {
             val inflater = LayoutInflater.from(requireContext())

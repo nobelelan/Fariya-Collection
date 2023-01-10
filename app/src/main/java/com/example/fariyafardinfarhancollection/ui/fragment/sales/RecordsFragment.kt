@@ -7,13 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
+import com.example.fariyafardinfarhancollection.SwipeToDelete
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentRecordsBinding
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
+import com.google.android.material.snackbar.Snackbar
 
 
 class RecordsFragment : Fragment() {
@@ -54,6 +58,19 @@ class RecordsFragment : Fragment() {
         val rvSales = binding.rvSales
         rvSales.adapter = salesAdapter
         rvSales.layoutManager = LinearLayoutManager(requireContext())
+
+        val swipeToDeleteCallback = object : SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tobeDeletedItem = salesAdapter.differ.currentList[viewHolder.adapterPosition]
+                shopViewModel.deleteSaleToday(tobeDeletedItem)
+                salesAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                Snackbar.make(viewHolder.itemView, "Item Deleted!", Snackbar.LENGTH_LONG)
+                    .setAction("Undo"){ shopViewModel.insertSaleToday(tobeDeletedItem) }
+                    .show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(rvSales)
     }
 
     override fun onDestroyView() {

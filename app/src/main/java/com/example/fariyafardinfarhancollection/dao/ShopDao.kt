@@ -34,6 +34,8 @@ interface ShopDao {
     fun getAllSaleToday():LiveData<List<SaleToday>>
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertSaleToday(saleToday: SaleToday)
+    @Delete
+    suspend fun deleteSaleToday(saleToday: SaleToday)
 
     @Query("SELECT * FROM other_payment_received_table")
     fun getAllOtherPaymentReceived(): LiveData<List<OtherPaymentReceived>>

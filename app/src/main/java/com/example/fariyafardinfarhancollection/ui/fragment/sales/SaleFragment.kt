@@ -13,14 +13,18 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
+import com.example.fariyafardinfarhancollection.SwipeToDelete
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentSaleBinding
 import com.example.fariyafardinfarhancollection.model.*
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
+import com.google.android.material.snackbar.Snackbar
 import java.util.*
 
 
@@ -168,6 +172,19 @@ class SaleFragment : Fragment() {
         rvSpentToday.adapter = spentTodayAdapter
         rvSpentToday.layoutManager = LinearLayoutManager(requireContext())
 
+        val swipeToDeleteCallback = object : SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tobeDeletedItem = spentTodayAdapter.differ.currentList[viewHolder.adapterPosition]
+                shopViewModel.deleteSpentToday(tobeDeletedItem)
+                spentTodayAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                Snackbar.make(viewHolder.itemView, "Item Deleted!", Snackbar.LENGTH_LONG)
+                    .setAction("Undo"){ shopViewModel.insertSpentToday(tobeDeletedItem) }
+                    .show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(rvSpentToday)
+
         val spentToday1 = SpentToday(1)
         val spentToday2 = SpentToday(2)
         val spentToday3 = SpentToday(3)
@@ -185,6 +202,19 @@ class SaleFragment : Fragment() {
         val rvOtherPayment = binding.rvOtherPayment
         rvOtherPayment.adapter = otherPaymentReceivedAdapter
         rvOtherPayment.layoutManager = LinearLayoutManager(requireContext())
+
+        val swipeToDeleteCallback = object : SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tobeDeletedItem = otherPaymentReceivedAdapter.differ.currentList[viewHolder.adapterPosition]
+                shopViewModel.deleteOtherPaymentReceived(tobeDeletedItem)
+                otherPaymentReceivedAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                Snackbar.make(viewHolder.itemView, "Item Deleted!", Snackbar.LENGTH_LONG)
+                    .setAction("Undo"){ shopViewModel.insertOtherPaymentReceived(tobeDeletedItem) }
+                    .show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(rvOtherPayment)
 
         val otherPaymentReceived1 = OtherPaymentReceived(1)
         val otherPaymentReceived2 = OtherPaymentReceived(2)
@@ -311,6 +341,19 @@ class SaleFragment : Fragment() {
         rvWholeSaleItems.adapter = salesWholesaleCountAdapter
         rvWholeSaleItems.layoutManager = LinearLayoutManager(requireContext())
 
+        val swipeToDeleteCallback = object : SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tobeDeletedItem = salesWholesaleCountAdapter.differ.currentList[viewHolder.adapterPosition]
+                shopViewModel.deleteWholesaleCount(tobeDeletedItem)
+                salesWholesaleCountAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                Snackbar.make(viewHolder.itemView, "Item Deleted!", Snackbar.LENGTH_LONG)
+                    .setAction("Undo"){ shopViewModel.insertWholesaleCount(tobeDeletedItem) }
+                    .show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(rvWholeSaleItems)
+
         val wholesaleCount1 = WholesaleCount(1)
         val wholesaleCount2 = WholesaleCount(2)
         val wholesaleCount3 = WholesaleCount(3)
@@ -340,6 +383,19 @@ class SaleFragment : Fragment() {
         val rvRetailItems = binding.rvRetailItems
         rvRetailItems.adapter = salesProductCountAdapter
         rvRetailItems.layoutManager = LinearLayoutManager(requireContext())
+
+        val swipeToDeleteCallback = object : SwipeToDelete(){
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val tobeDeletedItem = salesProductCountAdapter.differ.currentList[viewHolder.adapterPosition]
+                shopViewModel.deleteProductCount(tobeDeletedItem)
+                salesProductCountAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                Snackbar.make(viewHolder.itemView, "Item Deleted!", Snackbar.LENGTH_LONG)
+                    .setAction("Undo"){ shopViewModel.insertProductCount(tobeDeletedItem) }
+                    .show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+        itemTouchHelper.attachToRecyclerView(rvRetailItems)
 
         val productCount1 = ProductCount(1)
         val productCount2 = ProductCount(2)
