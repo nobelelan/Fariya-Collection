@@ -301,20 +301,28 @@ class SaleFragment : Fragment() {
                     }
                 })
                 var retailSaleText = ""
+                var retailCounter = 1
                 retailSale.forEach {
-                    retailSaleText += "${it.pcId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                    retailSaleText += "$retailCounter    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                    retailCounter += 1
                 }
                 var wholesaleText = ""
+                var wholesaleCounter = 1
                 wholesale.forEach {
-                    wholesaleText += "${it.wsId}    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                    wholesaleText += "$wholesaleCounter    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                    wholesaleCounter += 1
                 }
                 var otherPaymentText = ""
+                var otherPaymentCounter = 1
                 otherPayment.forEach {
-                    otherPaymentText += "${it.otherPaymentId}    ${it.senderName}    (${it.paymentMethod})    =    ${it.amount}\n"
+                    otherPaymentText += "$otherPaymentCounter    ${it.senderName}    (${it.paymentMethod})    =    ${it.amount}\n"
+                    otherPaymentCounter += 1
                 }
                 var spentTodayText = ""
+                var spentTodayCounter = 1
                 spentToday.forEach {
-                    spentTodayText += "${it.spentTodayId}    ${it.reason}    =    ${it.amount}\n"
+                    spentTodayText += "$spentTodayCounter    ${it.reason}    =    ${it.amount}\n"
+                    spentTodayCounter += 1
                 }
                 shopViewModel.insertSaleToday(SaleToday(
                     saleId = 0,

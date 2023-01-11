@@ -49,7 +49,6 @@ class SpentTodayAdapter :
     override fun onBindViewHolder(holder: SpentTodayViewHolder, position: Int) {
         val spentToday = differ.currentList[position]
         holder.binding.apply {
-            txtSerialNo.text = " ${spentToday.spentTodayId} "
             edtReason.setText(spentToday.reason)
             edtAmount.setText(spentToday.amount)
         }

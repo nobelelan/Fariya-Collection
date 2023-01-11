@@ -46,8 +46,6 @@ class SalesWholesaleCountAdapter :
     override fun onBindViewHolder(holder: SalesProductCountViewHolder, position: Int) {
         val wholesaleCount = differ.currentList[position]
 
-        holder.binding.txtSerialNo.text = " ${wholesaleCount.wsId} "
-
         holder.binding.edtProductName.setText(wholesaleCount.name)
         holder.binding.edtQuantity.setText(wholesaleCount.quantity)
         holder.binding.edtPrice.setText(wholesaleCount.price)

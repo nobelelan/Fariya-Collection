@@ -45,8 +45,6 @@ class SalesProductCountAdapter :
     override fun onBindViewHolder(holder: SalesProductCountViewHolder, position: Int) {
         val productCount = differ.currentList[position]
 
-        holder.binding.txtSerialNo.text = " ${productCount.pcId} "
-
         holder.binding.edtProductName.setText(productCount.name)
         holder.binding.edtQuantity.setText(productCount.quantity)
         holder.binding.edtPrice.setText(productCount.price)

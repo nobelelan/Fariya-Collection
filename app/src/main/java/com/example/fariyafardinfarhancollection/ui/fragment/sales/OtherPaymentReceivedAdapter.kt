@@ -47,7 +47,6 @@ class OtherPaymentReceivedAdapter :
     override fun onBindViewHolder(holder: OtherPaymentReceivedViewHolder, position: Int) {
         val otherPaymentReceived = differ.currentList[position]
         holder.binding.apply {
-            txtSerialNo.text = " ${otherPaymentReceived.otherPaymentId} "
             edtSenderName.setText(otherPaymentReceived.senderName)
             edtPaymentMethod.setText(otherPaymentReceived.paymentMethod)
             edtAmount.setText(otherPaymentReceived.amount)
