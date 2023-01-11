@@ -67,4 +67,13 @@ interface ShopDao {
     suspend fun updateCustomerContact(customerContact: CustomerContact)
     @Delete
     suspend fun deleteCustomerContact(customerContact: CustomerContact)
+
+    @Query("SELECT * FROM store_product_table ORDER BY storeProductId DESC")
+    fun getAllStoreProduct(): LiveData<List<StoreProduct>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertStoreProduct(storeProduct: StoreProduct)
+    @Update
+    suspend fun updateStoreProduct(storeProduct: StoreProduct)
+    @Delete
+    suspend fun deleteStoreProduct(storeProduct: StoreProduct)
 }

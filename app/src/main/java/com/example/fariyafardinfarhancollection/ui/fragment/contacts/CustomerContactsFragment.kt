@@ -78,7 +78,7 @@ class CustomerContactsFragment : Fragment() {
                 val customerDue = ccBinding.edtCustomerDue.text.toString().toIntOrNull()
                 if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue.toString())){
                     shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue))
-                    Toast.makeText(requireContext(), "Update Successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }

@@ -21,6 +21,12 @@ fun verifyCustomerInformation(name: String, phone: String, address: String, due:
             name.isNotEmpty() && phone.isNotEmpty()
 }
 
+fun verifyProductInformation(productName: String, quantityLeft: String, retailPrice: String, wholesalePrice: String): Boolean{
+    return (productName.isNotEmpty() && quantityLeft.isNotEmpty() && retailPrice.isNotEmpty() && wholesalePrice.isNotEmpty()) ||
+            (productName.isNotEmpty() && retailPrice.isNotEmpty()) || (productName.isNotEmpty() && quantityLeft.isNotEmpty()) ||
+            productName.isNotEmpty() && wholesalePrice.isNotEmpty()
+}
+
 abstract class SwipeToDelete: ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT){
     override fun onMove(
         recyclerView: RecyclerView,

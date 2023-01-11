@@ -14,7 +14,8 @@ import com.example.fariyafardinfarhancollection.model.*
         SaleToday::class,
         OtherPaymentReceived::class,
         SpentToday::class,
-        CustomerContact::class
+        CustomerContact::class,
+        StoreProduct::class
     ],
     version = 1,
     exportSchema = false
