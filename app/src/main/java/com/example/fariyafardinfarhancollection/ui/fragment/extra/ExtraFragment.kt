@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
@@ -19,6 +21,8 @@ import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderF
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ExtraFragment : Fragment() {
 
@@ -41,10 +45,13 @@ class ExtraFragment : Fragment() {
 
         auth = Firebase.auth
 
-        binding.btnSignOut.setOnClickListener {
+        binding.txtSignOut.setOnClickListener {
             auth.signOut()
             activity?.finish()
             startActivity(Intent(requireContext(), LoginActivity::class.java))
+        }
+        binding.btnCurrencyConverter.setOnClickListener {
+            findNavController().navigate(R.id.action_extraFragment_to_currencyConverterFragment)
         }
     }
 

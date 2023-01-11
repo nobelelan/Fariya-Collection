@@ -9,5 +9,14 @@
         android:id="@+id/extraFragment"
         android:name="com.example.fariyafardinfarhancollection.ui.fragment.extra.ExtraFragment"
         android:label="Others"
-        tools:layout="@layout/fragment_extra" />
+        tools:layout="@layout/fragment_extra" >
+        <action
+            android:id="@+id/action_extraFragment_to_currencyConverterFragment"
+            app:destination="@id/currencyConverterFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/currencyConverterFragment"
+        android:name="com.example.fariyafardinfarhancollection.ui.fragment.extra.CurrencyConverterFragment"
+        android:label="fragment_currency_converter"
+        tools:layout="@layout/fragment_currency_converter" />
 </navigation>
