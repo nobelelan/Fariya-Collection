@@ -51,7 +51,7 @@ class TestActivity : AppCompatActivity() {
                 .addOnSuccessListener {
                     Toast.makeText(this, "${employee.username} successfully registered!", Toast.LENGTH_SHORT).show()
                     auth.currentUser?.let {
-                        val registeredEmployee = Employee(employee.username, employee.email)
+                        val registeredEmployee = Employee(employee.username, employee.email, employee.contact)
                         val registeredDocumentReference = Firebase.firestore.collection("registeredEmployees").document(it.uid)
                         registeredDocumentReference.set(registeredEmployee)
                     }

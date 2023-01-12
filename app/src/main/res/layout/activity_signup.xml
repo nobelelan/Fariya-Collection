@@ -74,6 +74,30 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_input_contact"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        app:boxStrokeColor="@color/brown_dark"
+        app:boxStrokeWidth="1dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_input_email">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/edt_contact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone"
+            android:hint="Contact"
+            android:maxLength="30"
+            android:maxLines="1"
+            android:fontFamily="@font/gilroy_light"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_input_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -85,7 +109,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_input_email">
+        app:layout_constraintTop_toBottomOf="@+id/text_input_contact">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edt_password"

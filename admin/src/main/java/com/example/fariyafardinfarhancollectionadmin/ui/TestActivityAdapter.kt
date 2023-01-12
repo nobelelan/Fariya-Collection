@@ -33,6 +33,7 @@ class TestActivityAdapter: RecyclerView.Adapter<TestActivityAdapter.TestActivity
 
         holder.binding.txtUsername.text = employee.username
         holder.binding.txtEmail.text = employee.email
+        holder.binding.txtContact.text = employee.contact
         holder.binding.btnRegisterUser.setOnClickListener {
             onItemClickListener?.let { it(employee) }
         }

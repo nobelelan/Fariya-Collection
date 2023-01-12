@@ -29,11 +29,12 @@ class SignupActivity : AppCompatActivity() {
 
         val username = binding.edtUsername.text.toString()
         val email = binding.edtEmail.text.toString()
+        val contact = binding.edtContact.text.toString()
         val password = binding.edtPassword.text.toString()
         val password2 = binding.edtPassword2.text.toString()
 
-        if (verifyDataFromUser(username, email, password, password2)){
-            val employee = Employee(username, email, password)
+        if (verifyDataFromUser(username, email, contact, password, password2)){
+            val employee = Employee(username, email, contact, password)
             Firebase.firestore.collection("toRegisterEmployees").add(employee)
                 .addOnSuccessListener {
                     Toast.makeText(this, "Data sent successfully! Registration on going, sign in after 24 hours.", Toast.LENGTH_LONG).show()
