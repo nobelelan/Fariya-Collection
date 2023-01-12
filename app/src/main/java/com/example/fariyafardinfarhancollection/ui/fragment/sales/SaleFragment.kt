@@ -66,16 +66,39 @@ class SaleFragment : Fragment() {
         submitDataIntoSales()
 
         shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+            if (it.isEmpty()){
+                for (i in 1..10){
+                    shopViewModel.insertProductCount(ProductCount(0))
+                }
+            }
             salesProductCountAdapter.differ.submitList(it)
         })
         shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
-            salesWholesaleCountAdapter.differ.submitList(it)
+            if (it.isEmpty()){
+                for (i in 1..5){
+                    shopViewModel.insertWholesaleCount(WholesaleCount(0))
+                }
+            }else{
+                salesWholesaleCountAdapter.differ.submitList(it)
+            }
         })
         shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
-            otherPaymentReceivedAdapter.differ.submitList(it)
+            if (it.isEmpty()){
+                for (i in 1..3){
+                    shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
+                }
+            }else{
+                otherPaymentReceivedAdapter.differ.submitList(it)
+            }
         })
         shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
-            spentTodayAdapter.differ.submitList(it)
+            if (it.isEmpty()){
+                for (i in 1..3){
+                    shopViewModel.insertSpentToday(SpentToday(0))
+                }
+            }else{
+                spentTodayAdapter.differ.submitList(it)
+            }
         })
 
         salesProductCountAdapter.setUpdateItemListener(object : SalesProductCountAdapter.UpdateItemListener{
@@ -185,14 +208,6 @@ class SaleFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(rvSpentToday)
 
-        val spentToday1 = SpentToday(1)
-        val spentToday2 = SpentToday(2)
-        val spentToday3 = SpentToday(3)
-
-        val emptySpentToday = arrayListOf(spentToday1, spentToday2, spentToday3)
-        emptySpentToday.forEach{
-            shopViewModel.insertSpentToday(it)
-        }
         binding.btnAddNewSpentAmount.setOnClickListener {
             shopViewModel.insertSpentToday(SpentToday(0))
         }
@@ -216,14 +231,6 @@ class SaleFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(rvOtherPayment)
 
-        val otherPaymentReceived1 = OtherPaymentReceived(1)
-        val otherPaymentReceived2 = OtherPaymentReceived(2)
-        val otherPaymentReceived3 = OtherPaymentReceived(3)
-
-        val emptyOtherPaymentReceived = arrayListOf(otherPaymentReceived1, otherPaymentReceived2, otherPaymentReceived3)
-        emptyOtherPaymentReceived.forEach{
-            shopViewModel.insertOtherPaymentReceived(it)
-        }
         binding.btnAddNewOtherPayment.setOnClickListener {
             shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
         }
@@ -362,16 +369,6 @@ class SaleFragment : Fragment() {
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(rvWholeSaleItems)
 
-        val wholesaleCount1 = WholesaleCount(1)
-        val wholesaleCount2 = WholesaleCount(2)
-        val wholesaleCount3 = WholesaleCount(3)
-        val wholesaleCount4 = WholesaleCount(4)
-        val wholesaleCount5 = WholesaleCount(5)
-
-        val emptyProductCount = arrayListOf(wholesaleCount1, wholesaleCount2, wholesaleCount3, wholesaleCount4, wholesaleCount5)
-        emptyProductCount.forEach{
-            shopViewModel.insertWholesaleCount(it)
-        }
         binding.btnAddNewWholesaleItem.setOnClickListener {
             shopViewModel.insertWholesaleCount(WholesaleCount(0))
         }
@@ -404,24 +401,6 @@ class SaleFragment : Fragment() {
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
         itemTouchHelper.attachToRecyclerView(rvRetailItems)
-
-        val productCount1 = ProductCount(1)
-        val productCount2 = ProductCount(2)
-        val productCount3 = ProductCount(3)
-        val productCount4 = ProductCount(4)
-        val productCount5 = ProductCount(5)
-        val productCount6 = ProductCount(6)
-        val productCount7 = ProductCount(7)
-        val productCount8 = ProductCount(8)
-        val productCount9 = ProductCount(9)
-        val productCount10 = ProductCount(10)
-
-        val emptyProductCount = arrayListOf(productCount1, productCount2, productCount3, productCount4, productCount5,
-            productCount6, productCount7, productCount8, productCount9, productCount10)
-
-        emptyProductCount.forEach{
-            shopViewModel.insertProductCount(it)
-        }
 
         binding.btnAddNewProductItem.setOnClickListener {
             shopViewModel.insertProductCount(ProductCount(0))
