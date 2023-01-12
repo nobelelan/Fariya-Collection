@@ -47,4 +47,9 @@ class ShopRepository(
     suspend fun insertStoreProduct(storeProduct: StoreProduct) = shopDao.insertStoreProduct(storeProduct)
     suspend fun updateStoreProduct(storeProduct: StoreProduct) = shopDao.updateStoreProduct(storeProduct)
     suspend fun deleteStoreProduct(storeProduct: StoreProduct) = shopDao.deleteStoreProduct(storeProduct)
+
+    fun getAllPublicPost() = shopDao.getAllPublicPost()
+    suspend fun insertPublicPost(publicPost: PublicPost) = shopDao.insertPublicPost(publicPost)
+    suspend fun updatePublicPost(publicPost: PublicPost) = shopDao.updatePublicPost(publicPost)
+    suspend fun deletePublicPost(publicPost: PublicPost) = shopDao.deletePublicPost(publicPost)
 }
