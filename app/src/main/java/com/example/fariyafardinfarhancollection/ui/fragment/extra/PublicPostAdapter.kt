@@ -39,30 +39,27 @@ class PublicPostAdapter: RecyclerView.Adapter<PublicPostAdapter.PublicPostViewHo
             txtPost.text = publicPost.post
         }
 
-        holder.binding.imgEditPost.setOnClickListener {
-            itemClickListener!!.onEditClick(publicPost)
-        }
-        holder.binding.imgDeletePost.setOnClickListener {
-            itemClickListener!!.onDeleteClick(publicPost)
-        }
-        val editView = holder.binding.imgEditPost
-        val deleteView = holder.binding.imgDeletePost
-        itemClickListener!!.onViewSet(editView, deleteView)
+//        holder.binding.imgEditPost.setOnClickListener {
+//            itemClickListener!!.onEditClick(publicPost)
+//        }
+//        holder.binding.imgDeletePost.setOnClickListener {
+//            itemClickListener!!.onDeleteClick(publicPost)
+//        }
     }
 
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
 
-    private var itemClickListener: OnItemClickListener? = null
-
-    fun setOnItemClickListener(listener: OnItemClickListener){
-        itemClickListener = listener
-    }
-
-    interface OnItemClickListener{
-        fun onEditClick(publicPost: PublicPost)
-        fun onDeleteClick(publicPost: PublicPost)
-        fun onViewSet(editView: ImageView, deleteView: ImageView)
-    }
+    // TODO: needs to set user specific visibilit for updation or deletion
+//    private var itemClickListener: OnItemClickListener? = null
+//
+//    fun setOnItemClickListener(listener: OnItemClickListener){
+//        itemClickListener = listener
+//    }
+//
+//    interface OnItemClickListener{
+//        fun onEditClick(publicPost: PublicPost)
+//        fun onDeleteClick(publicPost: PublicPost)
+//    }
 }

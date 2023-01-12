@@ -89,7 +89,8 @@ class ExtraFragment : Fragment() {
             findNavController().navigate(R.id.action_extraFragment_to_currencyConverterFragment)
         }
 
-        publicPostAdapter.setOnItemClickListener(object : PublicPostAdapter.OnItemClickListener{
+        // TODO: needs to provide user specific visibility for updation or deletion
+        /*publicPostAdapter.setOnItemClickListener(object : PublicPostAdapter.OnItemClickListener{
             override fun onEditClick(publicPost: PublicPost) {
                 val inflater = LayoutInflater.from(requireContext())
                 val ppBinding = DialogEditPublicPostBinding.inflate(inflater)
@@ -118,22 +119,7 @@ class ExtraFragment : Fragment() {
                 builder.create().show()
             }
 
-            override fun onViewSet(editView: ImageView, deleteView: ImageView) {
-                shopViewModel.getAllPublicPost.observe(viewLifecycleOwner, Observer {
-//                    it.forEach { publicPost ->
-//                        if (currentEmployee?.username == publicPost.employeeName){
-//                            editView.visibility = View.VISIBLE
-//                            deleteView.visibility = View.VISIBLE
-//                        }else{
-//                            editView.visibility = View.INVISIBLE
-//                            deleteView.visibility = View.INVISIBLE
-//                        }
-//                    }
-                    editView.visibility = View.VISIBLE
-                    deleteView.visibility = View.VISIBLE
-                })
-            }
-        })
+        })*/
     }
 
     private fun setEmployeeProfile() {
