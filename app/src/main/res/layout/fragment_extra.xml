@@ -177,7 +177,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_public_post"
             android:layout_width="0dp"
-            android:layout_height="500dp"
+            android:layout_height="700dp"
             android:layout_marginTop="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

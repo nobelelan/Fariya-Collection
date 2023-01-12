@@ -1,11 +1,14 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.extra
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -15,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.SwipeToDelete
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
+import com.example.fariyafardinfarhancollection.databinding.DialogEditPublicPostBinding
+import com.example.fariyafardinfarhancollection.databinding.DialogUpsertCustomerContactBinding
 import com.example.fariyafardinfarhancollection.databinding.FragmentExtraBinding
 import com.example.fariyafardinfarhancollection.model.Employee
 import com.example.fariyafardinfarhancollection.model.PublicPost
@@ -71,13 +76,64 @@ class ExtraFragment : Fragment() {
         })
 
         binding.txtSignOut.setOnClickListener {
-            auth.signOut()
-            activity?.finish()
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Signing off...")
+            builder.setNegativeButton("Cancel"){_,_->}
+            builder.setPositiveButton("Continue"){_,_->
+                auth.signOut()
+                activity?.finish()
+                startActivity(Intent(requireContext(), LoginActivity::class.java))
+            }.create().show()
         }
         binding.btnCurrencyConverter.setOnClickListener {
             findNavController().navigate(R.id.action_extraFragment_to_currencyConverterFragment)
         }
+
+        publicPostAdapter.setOnItemClickListener(object : PublicPostAdapter.OnItemClickListener{
+            override fun onEditClick(publicPost: PublicPost) {
+                val inflater = LayoutInflater.from(requireContext())
+                val ppBinding = DialogEditPublicPostBinding.inflate(inflater)
+
+                ppBinding.edtPost.setText(publicPost.post)
+
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setView(ppBinding.root)
+                builder.setNegativeButton("Cancel"){_,_->}
+                builder.setPositiveButton("Done"){_,_->
+                    val updatedPost = ppBinding.edtPost.text.toString()
+                    shopViewModel.updatePublicPost(PublicPost(publicPost.publicPostId,publicPost.employeeName, publicPost.dateAndTime, updatedPost))
+                    Toast.makeText(requireContext(), "Updated successfully!", Toast.LENGTH_SHORT).show()
+                }
+                builder.create().show()
+            }
+
+            override fun onDeleteClick(publicPost: PublicPost) {
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Delete post?")
+                builder.setNegativeButton("No"){_,_->}
+                builder.setPositiveButton("Yes"){_,_->
+                    shopViewModel.deletePublicPost(publicPost)
+                    Toast.makeText(requireContext(), "Post deleted successfully!", Toast.LENGTH_SHORT).show()
+                }
+                builder.create().show()
+            }
+
+            override fun onViewSet(editView: ImageView, deleteView: ImageView) {
+                shopViewModel.getAllPublicPost.observe(viewLifecycleOwner, Observer {
+//                    it.forEach { publicPost ->
+//                        if (currentEmployee?.username == publicPost.employeeName){
+//                            editView.visibility = View.VISIBLE
+//                            deleteView.visibility = View.VISIBLE
+//                        }else{
+//                            editView.visibility = View.INVISIBLE
+//                            deleteView.visibility = View.INVISIBLE
+//                        }
+//                    }
+                    editView.visibility = View.VISIBLE
+                    deleteView.visibility = View.VISIBLE
+                })
+            }
+        })
     }
 
     private fun setEmployeeProfile() {
@@ -97,28 +153,12 @@ class ExtraFragment : Fragment() {
         rvPublicPost.adapter = publicPostAdapter
         rvPublicPost.layoutManager = LinearLayoutManager(requireContext())
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val tobeDeletedItem = publicPostAdapter.differ.currentList[viewHolder.adapterPosition]
-                shopViewModel.deletePublicPost(tobeDeletedItem)
-                publicPostAdapter.notifyItemRemoved(viewHolder.adapterPosition)
-                Snackbar.make(viewHolder.itemView, "Post Deleted!", Snackbar.LENGTH_LONG)
-                    .setAction("Undo"){ shopViewModel.insertPublicPost(tobeDeletedItem) }
-                    .show()
-            }
-        }
-        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvPublicPost)
-
         binding.btnCreatePost.setOnClickListener {
             val calender = Calendar.getInstance()
-            val year = calender.get(Calendar.YEAR)
-            val month = calender.get(Calendar.MONTH)
-            val day = calender.get(Calendar.DAY_OF_MONTH)
             val time = calender.time
 
             val employeeName = currentEmployee?.username
-            val dateAndTime = "$time : $day/${month + 1}/$year"
+            val dateAndTime = "$time"
             val post = binding.edtCreatePost.text.toString()
 
             shopViewModel.insertPublicPost(PublicPost(0, employeeName, dateAndTime, post))

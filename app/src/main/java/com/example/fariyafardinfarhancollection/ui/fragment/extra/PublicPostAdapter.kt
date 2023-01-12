@@ -1,7 +1,9 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.extra
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +45,9 @@ class PublicPostAdapter: RecyclerView.Adapter<PublicPostAdapter.PublicPostViewHo
         holder.binding.imgDeletePost.setOnClickListener {
             itemClickListener!!.onDeleteClick(publicPost)
         }
+        val editView = holder.binding.imgEditPost
+        val deleteView = holder.binding.imgDeletePost
+        itemClickListener!!.onViewSet(editView, deleteView)
     }
 
     override fun getItemCount(): Int {
@@ -58,5 +63,6 @@ class PublicPostAdapter: RecyclerView.Adapter<PublicPostAdapter.PublicPostViewHo
     interface OnItemClickListener{
         fun onEditClick(publicPost: PublicPost)
         fun onDeleteClick(publicPost: PublicPost)
+        fun onViewSet(editView: ImageView, deleteView: ImageView)
     }
 }
