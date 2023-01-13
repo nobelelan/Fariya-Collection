@@ -75,7 +75,7 @@ class SaleFragment : Fragment() {
         })
         shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
             if (it.isEmpty()){
-                for (i in 1..5){
+                for (i in 1..4){
                     shopViewModel.insertWholesaleCount(WholesaleCount(0))
                 }
             }else{
@@ -195,7 +195,7 @@ class SaleFragment : Fragment() {
         rvSpentToday.adapter = spentTodayAdapter
         rvSpentToday.layoutManager = LinearLayoutManager(requireContext())
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
+        /*val swipeToDeleteCallback = object : SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val tobeDeletedItem = spentTodayAdapter.differ.currentList[viewHolder.adapterPosition]
                 shopViewModel.deleteSpentToday(tobeDeletedItem)
@@ -206,7 +206,7 @@ class SaleFragment : Fragment() {
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvSpentToday)
+        itemTouchHelper.attachToRecyclerView(rvSpentToday)*/
 
         binding.btnAddNewSpentAmount.setOnClickListener {
             shopViewModel.insertSpentToday(SpentToday(0))
@@ -218,7 +218,7 @@ class SaleFragment : Fragment() {
         rvOtherPayment.adapter = otherPaymentReceivedAdapter
         rvOtherPayment.layoutManager = LinearLayoutManager(requireContext())
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
+        /*val swipeToDeleteCallback = object : SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val tobeDeletedItem = otherPaymentReceivedAdapter.differ.currentList[viewHolder.adapterPosition]
                 shopViewModel.deleteOtherPaymentReceived(tobeDeletedItem)
@@ -229,7 +229,7 @@ class SaleFragment : Fragment() {
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvOtherPayment)
+        itemTouchHelper.attachToRecyclerView(rvOtherPayment)*/
 
         binding.btnAddNewOtherPayment.setOnClickListener {
             shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
@@ -356,7 +356,7 @@ class SaleFragment : Fragment() {
         rvWholeSaleItems.adapter = salesWholesaleCountAdapter
         rvWholeSaleItems.layoutManager = LinearLayoutManager(requireContext())
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
+        /*val swipeToDeleteCallback = object : SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val tobeDeletedItem = salesWholesaleCountAdapter.differ.currentList[viewHolder.adapterPosition]
                 shopViewModel.deleteWholesaleCount(tobeDeletedItem)
@@ -367,7 +367,7 @@ class SaleFragment : Fragment() {
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvWholeSaleItems)
+        itemTouchHelper.attachToRecyclerView(rvWholeSaleItems)*/
 
         binding.btnAddNewWholesaleItem.setOnClickListener {
             shopViewModel.insertWholesaleCount(WholesaleCount(0))
@@ -389,7 +389,7 @@ class SaleFragment : Fragment() {
         rvRetailItems.adapter = salesProductCountAdapter
         rvRetailItems.layoutManager = LinearLayoutManager(requireContext())
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
+        /*val swipeToDeleteCallback = object : SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val tobeDeletedItem = salesProductCountAdapter.differ.currentList[viewHolder.adapterPosition]
                 shopViewModel.deleteProductCount(tobeDeletedItem)
@@ -400,7 +400,7 @@ class SaleFragment : Fragment() {
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvRetailItems)
+        itemTouchHelper.attachToRecyclerView(rvRetailItems)*/
 
         binding.btnAddNewProductItem.setOnClickListener {
             shopViewModel.insertProductCount(ProductCount(0))

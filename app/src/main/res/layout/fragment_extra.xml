@@ -42,18 +42,29 @@
             app:layout_constraintTop_toBottomOf="@+id/text_employee_contact" />
 
         <TextView
-            android:id="@+id/text_employee_verify_text"
+            android:id="@+id/text_nid_text"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="12dp"
             android:fontFamily="@font/gilroy_light"
             android:maxLines="1"
-            android:text="Not Verified"
+            android:text="NID or Birth Certificate"
             android:textColor="@color/red"
             android:textSize="13sp"
             app:layout_constraintStart_toEndOf="@+id/img_employee_profile"
             app:layout_constraintTop_toBottomOf="@+id/text_employee_email" />
+        <ImageView
+            android:id="@+id/img_add_nid"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="16dp"
+            android:background="@color/light_grey"
+            app:layout_constraintStart_toEndOf="@id/text_nid_text"
+            app:layout_constraintTop_toTopOf="@id/text_nid_text"
+            app:layout_constraintBottom_toBottomOf="@+id/text_nid_text"
+            app:layout_goneMarginStart="8dp"
+            app:srcCompat="@drawable/ic_add" />
 
         <TextView
             android:id="@+id/text_employee_contact"

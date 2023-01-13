@@ -1,7 +1,9 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.extra
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,9 +17,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.fariyafardinfarhancollection.R
-import com.example.fariyafardinfarhancollection.SwipeToDelete
+import com.example.fariyafardinfarhancollection.*
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
+import com.example.fariyafardinfarhancollection.databinding.DialogEditEmployeeProfileBinding
 import com.example.fariyafardinfarhancollection.databinding.DialogEditPublicPostBinding
 import com.example.fariyafardinfarhancollection.databinding.DialogUpsertCustomerContactBinding
 import com.example.fariyafardinfarhancollection.databinding.FragmentExtraBinding
@@ -30,6 +32,8 @@ import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderF
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
@@ -47,6 +51,8 @@ class ExtraFragment : Fragment() {
     private lateinit var shopViewModel: ShopViewModel
 
     private var currentEmployee: Employee? = null
+
+    private lateinit var documentSnapshot: DocumentReference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -89,6 +95,10 @@ class ExtraFragment : Fragment() {
             findNavController().navigate(R.id.action_extraFragment_to_currencyConverterFragment)
         }
 
+        binding.imgEditProfile.setOnClickListener {
+            setUpEditProfile()
+        }
+
         // TODO: needs to provide user specific visibility for updation or deletion
         /*publicPostAdapter.setOnItemClickListener(object : PublicPostAdapter.OnItemClickListener{
             override fun onEditClick(publicPost: PublicPost) {
@@ -122,8 +132,37 @@ class ExtraFragment : Fragment() {
         })*/
     }
 
+    private fun setUpEditProfile() {
+        val inflater = LayoutInflater.from(requireContext())
+        val epBinding = DialogEditEmployeeProfileBinding.inflate(inflater)
+        epBinding.edtEmployeeName.setText(currentEmployee?.username)
+        epBinding.edtContact.setText(currentEmployee?.contact)
+
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setView(epBinding.root)
+        builder.setNegativeButton("Cancel"){_,_->}
+        builder.setPositiveButton("Submit"){_,_->
+            if (epBinding.edtContact.text.toString() != "" && epBinding.edtEmployeeName.text.toString() != ""){
+                val updatedName = epBinding.edtEmployeeName.text.toString()
+                val updatedContact  = epBinding.edtContact.text.toString()
+                val updateEmployee = mapOf(
+                    "contact" to updatedContact,
+                    "username" to updatedName
+                )
+                documentSnapshot.update(updateEmployee)
+                    .addOnSuccessListener {
+                        Toast.makeText(requireContext(),"Successfully updated!", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener{
+                        Toast.makeText(requireContext(),"Failed!", Toast.LENGTH_SHORT).show()
+                    }
+            }
+        }
+        builder.create().show()
+    }
+
     private fun setEmployeeProfile() {
-        val documentSnapshot = Firebase.firestore.collection("registeredEmployees").document(auth.currentUser!!.uid)
+        documentSnapshot = Firebase.firestore.collection("registeredEmployees").document(auth.currentUser!!.uid)
         documentSnapshot.get().addOnSuccessListener {
             currentEmployee = it.toObject<Employee>()
             currentEmployee?.let { employee->
