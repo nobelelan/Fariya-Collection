@@ -1,8 +1,12 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.extra
 
+import android.app.Activity
 import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -37,6 +41,8 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
+import java.io.File
 import java.util.*
 
 class ExtraFragment : Fragment() {
@@ -53,6 +59,10 @@ class ExtraFragment : Fragment() {
     private var currentEmployee: Employee? = null
 
     private lateinit var documentSnapshot: DocumentReference
+
+    var employeeImageUri: Uri? = null
+    var employeeNidUri: Uri? = null
+    val imageReference = Firebase.storage.reference
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -80,6 +90,21 @@ class ExtraFragment : Fragment() {
         shopViewModel.getAllPublicPost.observe(viewLifecycleOwner, Observer {
             publicPostAdapter.differ.submitList(it)
         })
+
+        setImagesFromStorage()
+
+        binding.imgEmployeeProfile.setOnClickListener{
+            Intent(Intent.ACTION_PICK).also {
+                it.type = "image/*"
+                startActivityForResult(it, EMPLOYEE_IMAGE_REQUEST_CODE)
+            }
+        }
+        binding.imgAddNid.setOnClickListener{
+            Intent(Intent.ACTION_PICK).also {
+                it.type = "image/*"
+                startActivityForResult(it, NID_IMAGE_REQUEST_CODE)
+            }
+        }
 
         binding.txtSignOut.setOnClickListener {
             val builder = AlertDialog.Builder(requireContext())
@@ -130,6 +155,66 @@ class ExtraFragment : Fragment() {
             }
 
         })*/
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == EMPLOYEE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
+            data?.data?.let {
+                employeeImageUri = it
+                binding.imgEmployeeProfile.setImageURI(it)
+                uploadProfileImageToStorage()
+            }
+        }
+        if (requestCode == NID_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
+            data?.data.let {
+                employeeNidUri = it
+                binding.imgAddNid.setImageURI(it)
+                uploadNidImageToStorage()
+            }
+        }
+    }
+
+    private fun setImagesFromStorage(){
+        val profileReference = imageReference.child("empImages/${auth.currentUser!!.uid}/profileImage")
+        val profileLocalFile = File.createTempFile("profileFile",".jpg")
+        profileReference.getFile(profileLocalFile)
+            .addOnSuccessListener{
+                val bitmap = BitmapFactory.decodeFile(profileLocalFile.absolutePath)
+                binding.imgEmployeeProfile.setImageBitmap(bitmap)
+            }
+
+        val nidReference = imageReference.child("empImages/${auth.currentUser!!.uid}/nidImage")
+        val nidLocalFile = File.createTempFile("nidFile",".jpg")
+        nidReference.getFile(nidLocalFile)
+            .addOnSuccessListener{
+                binding.textNidText.setTextColor(resources.getColor(R.color.green))
+                val bitmap = BitmapFactory.decodeFile(nidLocalFile.absolutePath)
+                binding.imgAddNid.setImageBitmap(bitmap)
+            }
+    }
+
+    private fun uploadProfileImageToStorage(){
+        employeeImageUri?.let {
+            imageReference.child("empImages/${auth.currentUser!!.uid}/profileImage").putFile(it)
+                .addOnSuccessListener{
+                    Toast.makeText(requireContext(),"Successfully uploaded image!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener{
+                    Toast.makeText(requireContext(),"Image Upload Failed!", Toast.LENGTH_SHORT).show()
+                }
+        }
+    }
+    private fun uploadNidImageToStorage(){
+        employeeNidUri?.let {
+            imageReference.child("empImages/${auth.currentUser!!.uid}/nidImage").putFile(it)
+                .addOnSuccessListener{
+                    Toast.makeText(requireContext(),"Successfully uploaded image!", Toast.LENGTH_SHORT).show()
+                }
+                .addOnFailureListener{
+                    Toast.makeText(requireContext(),"Image Upload Failed!", Toast.LENGTH_SHORT).show()
+                }
+        }
     }
 
     private fun setUpEditProfile() {

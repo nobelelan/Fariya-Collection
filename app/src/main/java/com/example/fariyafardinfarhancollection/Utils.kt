@@ -3,8 +3,8 @@ package com.example.fariyafardinfarhancollection
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
-val EMPLOYEE_IMAGE_REQUEST_CODE = 100
-val NID_IMAGE_REQUEST_CODE = 1000
+val EMPLOYEE_IMAGE_REQUEST_CODE = 0
+val NID_IMAGE_REQUEST_CODE = 1
 
 fun verifyDataFromUser(username: String, email: String, contact: String, password: String, password2: String): Boolean{
     return (username.isNotEmpty() && email.isNotEmpty() && contact.isNotEmpty() && password.isNotEmpty() && password2.isNotEmpty()) && (password == password2)
