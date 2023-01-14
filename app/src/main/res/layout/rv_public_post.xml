@@ -12,16 +12,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="6dp">
+        android:padding="6dp"
+        android:layout_margin="4dp"
+        android:background="@drawable/custom_input">
 
         <TextView
             android:id="@+id/txt_employee_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/brown_dark"
-            android:padding="4dp"
             android:text="Employee Name"
-            android:textColor="@color/white"
+            android:textColor="@color/brown_dark"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
@@ -54,7 +54,6 @@
             android:textColor="@color/black"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:background="@drawable/custom_input"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/txt_date_and_time"

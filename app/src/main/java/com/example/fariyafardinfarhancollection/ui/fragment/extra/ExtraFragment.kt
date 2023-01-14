@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +31,9 @@ import com.example.fariyafardinfarhancollection.databinding.DialogUpsertCustomer
 import com.example.fariyafardinfarhancollection.databinding.FragmentExtraBinding
 import com.example.fariyafardinfarhancollection.model.Employee
 import com.example.fariyafardinfarhancollection.model.PublicPost
+import com.example.fariyafardinfarhancollection.notification.NotificationData
+import com.example.fariyafardinfarhancollection.notification.PushNotification
+import com.example.fariyafardinfarhancollection.notification.RetrofitInstance
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.ui.LoginActivity
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
@@ -41,7 +46,12 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.ktx.storage
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 
@@ -77,11 +87,14 @@ class ExtraFragment : Fragment() {
         _binding = FragmentExtraBinding.bind(view)
 
         auth = Firebase.auth
+        FirebaseMessaging.getInstance().subscribeToTopic(TOPIC)
 
         val shopDao = ShopDatabase.getDatabase(requireContext()).shopDao()
         val shopRepository = ShopRepository(shopDao)
-        val shopViewModelProviderFactory = ShopViewModelProviderFactory(requireActivity().application, shopRepository)
-        shopViewModel = ViewModelProvider(this, shopViewModelProviderFactory)[ShopViewModel::class.java]
+        val shopViewModelProviderFactory =
+            ShopViewModelProviderFactory(requireActivity().application, shopRepository)
+        shopViewModel =
+            ViewModelProvider(this, shopViewModelProviderFactory)[ShopViewModel::class.java]
 
         setEmployeeProfile()
 
@@ -93,13 +106,13 @@ class ExtraFragment : Fragment() {
 
         setImagesFromStorage()
 
-        binding.imgEmployeeProfile.setOnClickListener{
+        binding.imgEmployeeProfile.setOnClickListener {
             Intent(Intent.ACTION_PICK).also {
                 it.type = "image/*"
                 startActivityForResult(it, EMPLOYEE_IMAGE_REQUEST_CODE)
             }
         }
-        binding.imgAddNid.setOnClickListener{
+        binding.imgAddNid.setOnClickListener {
             Intent(Intent.ACTION_PICK).also {
                 it.type = "image/*"
                 startActivityForResult(it, NID_IMAGE_REQUEST_CODE)
@@ -109,8 +122,8 @@ class ExtraFragment : Fragment() {
         binding.txtSignOut.setOnClickListener {
             val builder = AlertDialog.Builder(requireContext())
             builder.setTitle("Signing off...")
-            builder.setNegativeButton("Cancel"){_,_->}
-            builder.setPositiveButton("Continue"){_,_->
+            builder.setNegativeButton("Cancel") { _, _ -> }
+            builder.setPositiveButton("Continue") { _, _ ->
                 auth.signOut()
                 activity?.finish()
                 startActivity(Intent(requireContext(), LoginActivity::class.java))
@@ -157,16 +170,29 @@ class ExtraFragment : Fragment() {
         })*/
     }
 
+    private fun sendNotification(notification: PushNotification) =
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.api.postNotification(notification)
+//                if (response.isSuccessful) {
+//                    Log.d("ExtraFragment", "Response: ${Gson().toJson(response)}")
+//                }
+            } catch (e: Exception) {
+                Log.e("ExtraFragment", e.toString())
+            }
+
+        }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == EMPLOYEE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == EMPLOYEE_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             data?.data?.let {
                 employeeImageUri = it
                 binding.imgEmployeeProfile.setImageURI(it)
                 uploadProfileImageToStorage()
             }
         }
-        if (requestCode == NID_IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
+        if (requestCode == NID_IMAGE_REQUEST_CODE && resultCode == RESULT_OK) {
             data?.data.let {
                 employeeNidUri = it
                 binding.imgAddNid.setImageURI(it)
@@ -175,44 +201,56 @@ class ExtraFragment : Fragment() {
         }
     }
 
-    private fun setImagesFromStorage(){
-        val profileReference = imageReference.child("empImages/${auth.currentUser!!.uid}/profileImage")
-        val profileLocalFile = File.createTempFile("profileFile",".jpg")
+    private fun setImagesFromStorage() {
+        val profileReference =
+            imageReference.child("empImages/${auth.currentUser!!.uid}/profileImage")
+        val profileLocalFile = File.createTempFile("profileFile", ".jpg")
         profileReference.getFile(profileLocalFile)
-            .addOnSuccessListener{
+            .addOnSuccessListener {
                 val bitmap = BitmapFactory.decodeFile(profileLocalFile.absolutePath)
                 binding.imgEmployeeProfile.setImageBitmap(bitmap)
             }
 
         val nidReference = imageReference.child("empImages/${auth.currentUser!!.uid}/nidImage")
-        val nidLocalFile = File.createTempFile("nidFile",".jpg")
+        val nidLocalFile = File.createTempFile("nidFile", ".jpg")
         nidReference.getFile(nidLocalFile)
-            .addOnSuccessListener{
+            .addOnSuccessListener {
                 binding.textNidText.setTextColor(resources.getColor(R.color.green))
                 val bitmap = BitmapFactory.decodeFile(nidLocalFile.absolutePath)
                 binding.imgAddNid.setImageBitmap(bitmap)
             }
     }
 
-    private fun uploadProfileImageToStorage(){
+    private fun uploadProfileImageToStorage() {
         employeeImageUri?.let {
             imageReference.child("empImages/${auth.currentUser!!.uid}/profileImage").putFile(it)
-                .addOnSuccessListener{
-                    Toast.makeText(requireContext(),"Successfully uploaded image!", Toast.LENGTH_SHORT).show()
+                .addOnSuccessListener {
+                    Toast.makeText(
+                        requireContext(),
+                        "Successfully uploaded image!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                .addOnFailureListener{
-                    Toast.makeText(requireContext(),"Image Upload Failed!", Toast.LENGTH_SHORT).show()
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "Image Upload Failed!", Toast.LENGTH_SHORT)
+                        .show()
                 }
         }
     }
-    private fun uploadNidImageToStorage(){
+
+    private fun uploadNidImageToStorage() {
         employeeNidUri?.let {
             imageReference.child("empImages/${auth.currentUser!!.uid}/nidImage").putFile(it)
-                .addOnSuccessListener{
-                    Toast.makeText(requireContext(),"Successfully uploaded image!", Toast.LENGTH_SHORT).show()
+                .addOnSuccessListener {
+                    Toast.makeText(
+                        requireContext(),
+                        "Successfully uploaded image!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                .addOnFailureListener{
-                    Toast.makeText(requireContext(),"Image Upload Failed!", Toast.LENGTH_SHORT).show()
+                .addOnFailureListener {
+                    Toast.makeText(requireContext(), "Image Upload Failed!", Toast.LENGTH_SHORT)
+                        .show()
                 }
         }
     }
@@ -225,21 +263,25 @@ class ExtraFragment : Fragment() {
 
         val builder = AlertDialog.Builder(requireContext())
         builder.setView(epBinding.root)
-        builder.setNegativeButton("Cancel"){_,_->}
-        builder.setPositiveButton("Submit"){_,_->
-            if (epBinding.edtContact.text.toString() != "" && epBinding.edtEmployeeName.text.toString() != ""){
+        builder.setNegativeButton("Cancel") { _, _ -> }
+        builder.setPositiveButton("Submit") { _, _ ->
+            if (epBinding.edtContact.text.toString() != "" && epBinding.edtEmployeeName.text.toString() != "") {
                 val updatedName = epBinding.edtEmployeeName.text.toString()
-                val updatedContact  = epBinding.edtContact.text.toString()
+                val updatedContact = epBinding.edtContact.text.toString()
                 val updateEmployee = mapOf(
                     "contact" to updatedContact,
                     "username" to updatedName
                 )
                 documentSnapshot.update(updateEmployee)
                     .addOnSuccessListener {
-                        Toast.makeText(requireContext(),"Successfully updated!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Successfully updated!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                    .addOnFailureListener{
-                        Toast.makeText(requireContext(),"Failed!", Toast.LENGTH_SHORT).show()
+                    .addOnFailureListener {
+                        Toast.makeText(requireContext(), "Failed!", Toast.LENGTH_SHORT).show()
                     }
             }
         }
@@ -247,10 +289,11 @@ class ExtraFragment : Fragment() {
     }
 
     private fun setEmployeeProfile() {
-        documentSnapshot = Firebase.firestore.collection("registeredEmployees").document(auth.currentUser!!.uid)
+        documentSnapshot =
+            Firebase.firestore.collection("registeredEmployees").document(auth.currentUser!!.uid)
         documentSnapshot.get().addOnSuccessListener {
             currentEmployee = it.toObject<Employee>()
-            currentEmployee?.let { employee->
+            currentEmployee?.let { employee ->
                 binding.textEmployeeName.text = employee.username
                 binding.textEmployeeEmail.text = employee.email
                 binding.textEmployeeContact.text = employee.contact
@@ -270,6 +313,13 @@ class ExtraFragment : Fragment() {
             val employeeName = currentEmployee?.username
             val dateAndTime = "$time"
             val post = binding.edtCreatePost.text.toString()
+
+            PushNotification(
+                NotificationData(employeeName!!, post),
+                TOPIC
+            ).also {
+                sendNotification(it)
+            }
 
             shopViewModel.insertPublicPost(PublicPost(0, employeeName, dateAndTime, post))
         }
