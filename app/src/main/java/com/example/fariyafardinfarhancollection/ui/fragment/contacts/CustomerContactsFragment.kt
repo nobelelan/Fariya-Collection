@@ -66,12 +66,22 @@ class CustomerContactsFragment : Fragment() {
 //            customerContactAdapter.differ.submitList(it)
 //        })
 
-        contactsCollectionRef.get().addOnSuccessListener {
-            val contactList = it.toObjects<CustomerContact>()
-            customerContactAdapter.differ.submitList(contactList)
+//        contactsCollectionRef.get().addOnSuccessListener {
+//            val contactList = it.toObjects<CustomerContact>()
+//            customerContactAdapter.differ.submitList(contactList)
 //            contactList.forEach { contact->
 //                shopViewModel.insertCustomerContact(contact)
 //            }
+//        }
+
+        contactsCollectionRef.addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            value?.let {
+                val contactList = it.toObjects<CustomerContact>()
+                customerContactAdapter.differ.submitList(contactList)
+            }
         }
 
         customerContactAdapter.setOnEditClickListener {
@@ -114,6 +124,8 @@ class CustomerContactsFragment : Fragment() {
                                     }.addOnSuccessListener { nothing->
 //                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
                                         Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                    }.addOnFailureListener{
+                                        Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             }
@@ -170,6 +182,8 @@ class CustomerContactsFragment : Fragment() {
                                     contactsCollectionRef.document(documentSnapshot.id).delete()
                                         .addOnSuccessListener {
                                             Toast.makeText(requireContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show()
+                                        }.addOnFailureListener {
+                                            Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
                                         }
                                 }
                             }
@@ -211,6 +225,8 @@ class CustomerContactsFragment : Fragment() {
                     }.addOnSuccessListener {
 //                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue.toIntOrNull()))
                         Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
                     }
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
