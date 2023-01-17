@@ -208,7 +208,9 @@ class ExtraFragment : Fragment() {
         profileReference.getFile(profileLocalFile)
             .addOnSuccessListener {
                 val bitmap = BitmapFactory.decodeFile(profileLocalFile.absolutePath)
-                binding.imgEmployeeProfile.setImageBitmap(bitmap)
+                bitmap?.let {
+                    binding.imgEmployeeProfile.setImageBitmap(it)
+                }
             }
 
         val nidReference = imageReference.child("empImages/${auth.currentUser!!.uid}/nidImage")
@@ -294,6 +296,7 @@ class ExtraFragment : Fragment() {
         documentSnapshot.get().addOnSuccessListener {
             currentEmployee = it.toObject<Employee>()
             currentEmployee?.let { employee ->
+                // TODO: app crashes if bottom nav changes before it can set all the data
                 binding.textEmployeeName.text = employee.username
                 binding.textEmployeeEmail.text = employee.email
                 binding.textEmployeeContact.text = employee.contact

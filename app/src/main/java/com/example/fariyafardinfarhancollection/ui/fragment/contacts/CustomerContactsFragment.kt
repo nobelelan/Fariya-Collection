@@ -164,9 +164,7 @@ class CustomerContactsFragment : Fragment() {
                 val builder = AlertDialog.Builder(requireContext())
                 builder.setTitle("Delete Contact!")
                 builder.setMessage("Contact information can never be restored.")
-                builder.setNegativeButton("Cancel"){_,_->
-                    customerContactAdapter.notifyItemRemoved(viewHolder.adapterPosition)
-                }
+                builder.setNegativeButton("Cancel"){_,_->}
                 builder.setPositiveButton("Delete"){_,_->
                     val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
                     contactsCollectionRef

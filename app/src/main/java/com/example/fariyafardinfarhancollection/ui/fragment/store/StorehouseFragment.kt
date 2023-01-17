@@ -29,6 +29,9 @@ import com.example.fariyafardinfarhancollection.verifyProductInformation
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.ktx.Firebase
 
 
 class StorehouseFragment : Fragment() {
@@ -39,6 +42,11 @@ class StorehouseFragment : Fragment() {
     private lateinit var shopViewModel: ShopViewModel
 
     private val storeProductAdapter by lazy { StoreProductAdapter() }
+
+    private val storeProductsCollectionRef = Firebase.firestore.collection("storeProducts")
+    private val storeProductsCounterCollectionRef = Firebase.firestore.collection("storeProductsCounter")
+
+    private var databaseContactsCounter: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -59,9 +67,19 @@ class StorehouseFragment : Fragment() {
 
         setUpStoreProductRecyclerView()
 
-        shopViewModel.getAllStoreProduct.observe(viewLifecycleOwner, Observer {
-            storeProductAdapter.differ.submitList(it)
-        })
+//        shopViewModel.getAllStoreProduct.observe(viewLifecycleOwner, Observer {
+//            storeProductAdapter.differ.submitList(it)
+//        })
+
+        storeProductsCollectionRef.addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            value?.let {
+                val productList = it.toObjects<StoreProduct>()
+                storeProductAdapter.differ.submitList(productList)
+            }
+        }
 
         storeProductAdapter.setOnEditClickListener {
             val inflater = LayoutInflater.from(requireContext())
@@ -77,13 +95,39 @@ class StorehouseFragment : Fragment() {
             builder.setTitle("Product information")
             builder.setNegativeButton("Cancel"){_,_->}
             builder.setPositiveButton("Done"){_,_->
-                val customerName = spBinding.edtProductName.text.toString()
+                val productName = spBinding.edtProductName.text.toString()
                 val quantityLeft = spBinding.edtQuantityLeft.text.toString()
                 val retailPrice = spBinding.edtRetailPrice.text.toString()
                 val wholesalePrice = spBinding.edtWholesalePrice.text.toString()
-                if (verifyProductInformation(customerName, quantityLeft, retailPrice, wholesalePrice)){
-                    shopViewModel.updateStoreProduct(StoreProduct(it.storeProductId, customerName, quantityLeft, retailPrice, wholesalePrice))
-                    Toast.makeText(requireContext(), "New Product Inserted!", Toast.LENGTH_SHORT).show()
+                if (verifyProductInformation(productName, quantityLeft, retailPrice, wholesalePrice)){
+                    storeProductsCollectionRef
+                        .whereEqualTo("storeProductId", it.storeProductId)
+                        .whereEqualTo("productName", it.productName)
+                        .whereEqualTo("quantityLeft", it.quantityLeft)
+                        .whereEqualTo("retailPrice", it.retailPrice)
+                        .whereEqualTo("wholesalePrice", it.wholesalePrice)
+                        .get()
+                        .addOnSuccessListener { querySnapshot->
+                            if (querySnapshot.documents.isNotEmpty()){
+                                querySnapshot.forEach { documentSnapshot->
+                                    Firebase.firestore.runTransaction { transaction->
+                                        val productsRef = storeProductsCollectionRef.document(documentSnapshot.id)
+                                        transaction.get(productsRef)
+                                        transaction.update(productsRef, "productName", productName)
+                                        transaction.update(productsRef, "quantityLeft", quantityLeft)
+                                        transaction.update(productsRef, "retailPrice", retailPrice)
+                                        transaction.update(productsRef, "wholesalePrice", wholesalePrice)
+                                        null
+                                    }.addOnSuccessListener { nothing->
+//                                        shopViewModel.updateStoreProduct(StoreProduct(it.storeProductId, productName, quantityLeft, retailPrice, wholesalePrice))
+                                        Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                    }.addOnFailureListener{e->
+                                        Toast.makeText(requireContext(), "Something went wrong!:${e.message}", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+
+                        }
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }
@@ -100,12 +144,41 @@ class StorehouseFragment : Fragment() {
 
         val swipeToDeleteCallback = object : SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val tobeDeletedItem = storeProductAdapter.differ.currentList[viewHolder.adapterPosition]
-                shopViewModel.deleteStoreProduct(tobeDeletedItem)
-                storeProductAdapter.notifyItemRemoved(viewHolder.adapterPosition)
-                Snackbar.make(viewHolder.itemView, "Product Deleted!", Snackbar.LENGTH_LONG)
-                    .setAction("Undo"){ shopViewModel.insertStoreProduct(tobeDeletedItem) }
-                    .show()
+                // Deletion from room db
+//                val tobeDeletedItem = storeProductAdapter.differ.currentList[viewHolder.adapterPosition]
+//                shopViewModel.deleteStoreProduct(tobeDeletedItem)
+//                storeProductAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+//                Snackbar.make(viewHolder.itemView, "Product Deleted!", Snackbar.LENGTH_LONG)
+//                    .setAction("Undo"){ shopViewModel.insertStoreProduct(tobeDeletedItem) }
+//                    .show()
+
+                // Deletion from firestore
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Delete Product!")
+                builder.setMessage("Product information can never be restored.")
+                builder.setNegativeButton("Cancel"){_,_->}
+                builder.setPositiveButton("Delete"){_,_->
+                    val tobeDeletedItem = storeProductAdapter.differ.currentList[viewHolder.adapterPosition]
+                    storeProductsCollectionRef
+                        .whereEqualTo("storeProductId", tobeDeletedItem.storeProductId)
+                        .whereEqualTo("productName", tobeDeletedItem.productName)
+                        .whereEqualTo("quantityLeft", tobeDeletedItem.quantityLeft)
+                        .whereEqualTo("retailPrice", tobeDeletedItem.retailPrice)
+                        .whereEqualTo("wholesalePrice", tobeDeletedItem.wholesalePrice)
+                        .get()
+                        .addOnSuccessListener { querySnapshot->
+                            if (querySnapshot.documents.isNotEmpty()){
+                                querySnapshot?.forEach { documentSnapshot->
+                                    storeProductsCollectionRef.document(documentSnapshot.id).delete()
+                                        .addOnSuccessListener {
+                                            Toast.makeText(requireContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show()
+                                        }.addOnFailureListener {
+                                            Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                                        }
+                                }
+                            }
+                        }
+                }.create().show()
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
@@ -119,13 +192,32 @@ class StorehouseFragment : Fragment() {
             builder.setTitle("Product Information")
             builder.setNegativeButton("Cancel"){_,_->}
             builder.setPositiveButton("Done"){_,_->
-                val customerName = spBinding.edtProductName.text.toString()
+                val productName = spBinding.edtProductName.text.toString()
                 val quantityLeft = spBinding.edtQuantityLeft.text.toString()
                 val retailPrice = spBinding.edtRetailPrice.text.toString()
                 val wholesalePrice = spBinding.edtWholesalePrice.text.toString()
-                if (verifyProductInformation(customerName, quantityLeft, retailPrice, wholesalePrice)){
-                    shopViewModel.insertStoreProduct(StoreProduct(0, customerName, quantityLeft, retailPrice, wholesalePrice))
-                    Toast.makeText(requireContext(), "New Product Inserted!", Toast.LENGTH_SHORT).show()
+                if (verifyProductInformation(productName, quantityLeft, retailPrice, wholesalePrice)){
+                    Firebase.firestore.runTransaction { transaction->
+                        val counterRef = storeProductsCounterCollectionRef.document("counter")
+                        val counter = transaction.get(counterRef)
+                        val newCounter = counter["storeProductId"] as Long + 1
+                        databaseContactsCounter = newCounter.toInt()
+                        transaction.update(counterRef,"storeProductId", newCounter)
+
+                        storeProductsCollectionRef.document().set(StoreProduct(
+                            newCounter.toInt(),
+                            productName,
+                            quantityLeft,
+                            retailPrice,
+                            wholesalePrice
+                        ))
+                        null
+                    }.addOnSuccessListener {
+//                        shopViewModel.insertStoreProduct(StoreProduct(0, productName, quantityLeft, retailPrice, wholesalePrice))
+                        Toast.makeText(requireContext(), "New Product Inserted!", Toast.LENGTH_SHORT).show()
+                    }.addOnFailureListener {
+                        Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                    }
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }
