@@ -62,15 +62,16 @@ class CustomerContactsFragment : Fragment() {
 
         setUpCustomerContactsRecyclerView()
 
-        shopViewModel.getAllCustomerContacts.observe(viewLifecycleOwner, Observer {
-            customerContactAdapter.differ.submitList(it)
-        })
+//        shopViewModel.getAllCustomerContacts.observe(viewLifecycleOwner, Observer {
+//            customerContactAdapter.differ.submitList(it)
+//        })
 
         contactsCollectionRef.get().addOnSuccessListener {
             val contactList = it.toObjects<CustomerContact>()
-            contactList.forEach { contact->
-                shopViewModel.insertCustomerContact(contact)
-            }
+            customerContactAdapter.differ.submitList(contactList)
+//            contactList.forEach { contact->
+//                shopViewModel.insertCustomerContact(contact)
+//            }
         }
 
         customerContactAdapter.setOnEditClickListener {
@@ -111,7 +112,7 @@ class CustomerContactsFragment : Fragment() {
                                         transaction.update(contactRef, "due", customerDue.toInt())
                                         null
                                     }.addOnSuccessListener { nothing->
-                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
+//                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
                                         Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
                                     }
                                 }
@@ -139,12 +140,41 @@ class CustomerContactsFragment : Fragment() {
 
         val swipeToDeleteCallback = object : SwipeToDelete(){
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
-                shopViewModel.deleteCustomerContact(tobeDeletedItem)
-                customerContactAdapter.notifyItemRemoved(viewHolder.adapterPosition)
-                Snackbar.make(viewHolder.itemView, "Contact Deleted!", Snackbar.LENGTH_LONG)
-                    .setAction("Undo"){ shopViewModel.insertCustomerContact(tobeDeletedItem) }
-                    .show()
+                // Deletion from database
+//                val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
+//                shopViewModel.deleteCustomerContact(tobeDeletedItem)
+//                customerContactAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+//                Snackbar.make(viewHolder.itemView, "Contact Deleted!", Snackbar.LENGTH_LONG)
+//                    .setAction("Undo"){ shopViewModel.insertCustomerContact(tobeDeletedItem) }
+//                    .show()
+
+                // Deletion from firestore
+                val builder = AlertDialog.Builder(requireContext())
+                builder.setTitle("Delete Contact!")
+                builder.setMessage("Contact information can never be restored.")
+                builder.setNegativeButton("Cancel"){_,_->
+                    customerContactAdapter.notifyItemRemoved(viewHolder.adapterPosition)
+                }
+                builder.setPositiveButton("Delete"){_,_->
+                    val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
+                    contactsCollectionRef
+                        .whereEqualTo("ccId", tobeDeletedItem.ccId)
+                        .whereEqualTo("name", tobeDeletedItem.name)
+                        .whereEqualTo("number", tobeDeletedItem.number)
+                        .whereEqualTo("address", tobeDeletedItem.address)
+                        .whereEqualTo("due", tobeDeletedItem.due)
+                        .get()
+                        .addOnSuccessListener { querySnapshot->
+                            if (querySnapshot.documents.isNotEmpty()){
+                                querySnapshot?.forEach { documentSnapshot->
+                                    contactsCollectionRef.document(documentSnapshot.id).delete()
+                                        .addOnSuccessListener {
+                                            Toast.makeText(requireContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show()
+                                        }
+                                }
+                            }
+                        }
+                }.create().show()
             }
         }
         val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
@@ -179,7 +209,7 @@ class CustomerContactsFragment : Fragment() {
                         ))
                         null
                     }.addOnSuccessListener {
-                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue.toIntOrNull()))
+//                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue.toIntOrNull()))
                         Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
                     }
                 }else{
