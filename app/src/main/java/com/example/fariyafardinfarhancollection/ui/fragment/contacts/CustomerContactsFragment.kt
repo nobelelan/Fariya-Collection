@@ -25,6 +25,9 @@ import com.example.fariyafardinfarhancollection.verifyCustomerInformation
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.ktx.Firebase
 
 class CustomerContactsFragment : Fragment() {
 
@@ -34,6 +37,11 @@ class CustomerContactsFragment : Fragment() {
     private lateinit var shopViewModel: ShopViewModel
 
     private val customerContactAdapter by lazy { CustomerContactAdapter() }
+
+    private val contactsCollectionRef = Firebase.firestore.collection("contacts")
+    private val contactsCounterCollectionRef = Firebase.firestore.collection("contactsCounter")
+
+    private var databaseContactsCounter: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +66,13 @@ class CustomerContactsFragment : Fragment() {
             customerContactAdapter.differ.submitList(it)
         })
 
+        contactsCollectionRef.get().addOnSuccessListener {
+            val contactList = it.toObjects<CustomerContact>()
+            contactList.forEach { contact->
+                shopViewModel.insertCustomerContact(contact)
+            }
+        }
+
         customerContactAdapter.setOnEditClickListener {
             val inflater = LayoutInflater.from(requireContext())
             val ccBinding = DialogUpsertCustomerContactBinding.inflate(inflater)
@@ -75,10 +90,33 @@ class CustomerContactsFragment : Fragment() {
                 val customerName = ccBinding.edtCustomerName.text.toString()
                 val customerContact = ccBinding.edtCustomerContact.text.toString()
                 val customerAddress = ccBinding.edtCustomerAddress.text.toString()
-                val customerDue = ccBinding.edtCustomerDue.text.toString().toIntOrNull()
-                if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue.toString())){
-                    shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue))
-                    Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                val customerDue = ccBinding.edtCustomerDue.text.toString()
+                if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue)){
+                    contactsCollectionRef
+                        .whereEqualTo("name", it.name)
+                        .whereEqualTo("number", it.number)
+                        .whereEqualTo("address", it.address)
+                        .whereEqualTo("due", it.due)
+                        .get()
+                        .addOnSuccessListener { querySnapshot->
+                            if (querySnapshot.documents.isNotEmpty()){
+                                querySnapshot.forEach { documentSnapshot->
+                                    Firebase.firestore.runTransaction { transaction->
+                                        val contactRef = contactsCollectionRef.document(documentSnapshot.id)
+                                        transaction.get(contactRef)
+                                        transaction.update(contactRef, "name", customerName)
+                                        transaction.update(contactRef, "number", customerContact)
+                                        transaction.update(contactRef, "address", customerAddress)
+                                        transaction.update(contactRef, "due", customerDue.toInt())
+                                        null
+                                    }.addOnSuccessListener { nothing->
+//                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
+                                        Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+
+                        }
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }
@@ -124,8 +162,25 @@ class CustomerContactsFragment : Fragment() {
                 val customerAddress = ccBinding.edtCustomerAddress.text.toString()
                 val customerDue = ccBinding.edtCustomerDue.text.toString().toIntOrNull()
                 if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue.toString())){
-                    shopViewModel.insertCustomerContact(CustomerContact(0, customerName, customerContact, customerAddress, customerDue))
-                    Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
+                    Firebase.firestore.runTransaction { transaction->
+                        val counterRef = contactsCounterCollectionRef.document("counter")
+                        val counter = transaction.get(counterRef)
+                        val newCounter = counter["counterId"] as Long + 1
+                        databaseContactsCounter = newCounter.toInt()
+                        transaction.update(counterRef,"counterId", newCounter)
+
+                        contactsCollectionRef.document().set(CustomerContact(
+                            newCounter.toInt(),
+                            customerName,
+                            customerContact,
+                            customerAddress,
+                            customerDue
+                        ))
+                        null
+                    }.addOnSuccessListener {
+//                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue))
+                        Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
+                    }
                 }else{
                     Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
                 }

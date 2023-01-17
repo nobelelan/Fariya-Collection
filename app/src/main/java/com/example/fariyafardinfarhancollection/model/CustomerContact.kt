@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "customer_contact_table")
 data class CustomerContact(
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     var ccId: Int = 1,
     var name: String? = null,
     var number: String? = null,
