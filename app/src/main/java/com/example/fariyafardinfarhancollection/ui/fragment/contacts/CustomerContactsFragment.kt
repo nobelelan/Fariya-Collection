@@ -93,6 +93,7 @@ class CustomerContactsFragment : Fragment() {
                 val customerDue = ccBinding.edtCustomerDue.text.toString()
                 if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue)){
                     contactsCollectionRef
+                        .whereEqualTo("ccId", it.ccId)
                         .whereEqualTo("name", it.name)
                         .whereEqualTo("number", it.number)
                         .whereEqualTo("address", it.address)
@@ -110,7 +111,7 @@ class CustomerContactsFragment : Fragment() {
                                         transaction.update(contactRef, "due", customerDue.toInt())
                                         null
                                     }.addOnSuccessListener { nothing->
-//                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
+                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
                                         Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
                                     }
                                 }
@@ -160,8 +161,8 @@ class CustomerContactsFragment : Fragment() {
                 val customerName = ccBinding.edtCustomerName.text.toString()
                 val customerContact = ccBinding.edtCustomerContact.text.toString()
                 val customerAddress = ccBinding.edtCustomerAddress.text.toString()
-                val customerDue = ccBinding.edtCustomerDue.text.toString().toIntOrNull()
-                if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue.toString())){
+                val customerDue = ccBinding.edtCustomerDue.text.toString()
+                if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue)){
                     Firebase.firestore.runTransaction { transaction->
                         val counterRef = contactsCounterCollectionRef.document("counter")
                         val counter = transaction.get(counterRef)
@@ -174,11 +175,11 @@ class CustomerContactsFragment : Fragment() {
                             customerName,
                             customerContact,
                             customerAddress,
-                            customerDue
+                            customerDue.toIntOrNull()
                         ))
                         null
                     }.addOnSuccessListener {
-//                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue))
+                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue.toIntOrNull()))
                         Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
                     }
                 }else{

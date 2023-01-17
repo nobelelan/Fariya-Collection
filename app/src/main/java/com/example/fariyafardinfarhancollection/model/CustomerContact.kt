@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "customer_contact_table")
 data class CustomerContact(
     @PrimaryKey(autoGenerate = false)
-    var ccId: Int = 1,
-    var name: String? = null,
-    var number: String? = null,
-    var address: String? = null,
+    var ccId: Int = 0,
+    var name: String? = "",
+    var number: String? = "",
+    var address: String? = "",
     var due: Int? = null
 )
