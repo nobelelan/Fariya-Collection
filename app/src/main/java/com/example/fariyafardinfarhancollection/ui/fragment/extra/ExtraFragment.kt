@@ -31,6 +31,7 @@ import com.example.fariyafardinfarhancollection.databinding.DialogUpsertCustomer
 import com.example.fariyafardinfarhancollection.databinding.FragmentExtraBinding
 import com.example.fariyafardinfarhancollection.model.Employee
 import com.example.fariyafardinfarhancollection.model.PublicPost
+import com.example.fariyafardinfarhancollection.model.StoreProduct
 import com.example.fariyafardinfarhancollection.notification.NotificationData
 import com.example.fariyafardinfarhancollection.notification.PushNotification
 import com.example.fariyafardinfarhancollection.notification.RetrofitInstance
@@ -45,6 +46,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.storage.ktx.storage
@@ -74,6 +76,11 @@ class ExtraFragment : Fragment() {
     var employeeNidUri: Uri? = null
     val imageReference = Firebase.storage.reference
 
+    private val publicPostsCollectionRef = Firebase.firestore.collection("publicPosts")
+    private val publicPostsCounterCollectionRef = Firebase.firestore.collection("publicPostsCounter")
+
+    private var databasePostsCounter: Int? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -100,11 +107,21 @@ class ExtraFragment : Fragment() {
 
         setUpPublicPostRecyclerView()
 
-        shopViewModel.getAllPublicPost.observe(viewLifecycleOwner, Observer {
-            publicPostAdapter.differ.submitList(it)
-        })
+//        shopViewModel.getAllPublicPost.observe(viewLifecycleOwner, Observer {
+//            publicPostAdapter.differ.submitList(it)
+//        })
 
         setImagesFromStorage()
+
+        publicPostsCollectionRef.addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            value?.let { querySnapshot ->
+                val publicPostsList = querySnapshot.toObjects<PublicPost>()
+                publicPostAdapter.differ.submitList(publicPostsList)
+            }
+        }
 
         binding.imgEmployeeProfile.setOnClickListener {
             Intent(Intent.ACTION_PICK).also {
@@ -324,7 +341,21 @@ class ExtraFragment : Fragment() {
                 sendNotification(it)
             }
 
-            shopViewModel.insertPublicPost(PublicPost(0, employeeName, dateAndTime, post))
+            Firebase.firestore.runTransaction { transaction->
+                val counterRef = publicPostsCounterCollectionRef.document("counter")
+                val counter = transaction.get(counterRef)
+                val newCounter = counter["publicPostId"] as Long + 1
+                databasePostsCounter = newCounter.toInt()
+                transaction.update(counterRef,"publicPostId", newCounter)
+
+                publicPostsCollectionRef.document().set(PublicPost(newCounter.toInt(), employeeName, dateAndTime, post))
+                null
+            }.addOnSuccessListener {
+//              shopViewModel.insertPublicPost(PublicPost(0, employeeName, dateAndTime, post))
+                Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show()
+            }.addOnFailureListener {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

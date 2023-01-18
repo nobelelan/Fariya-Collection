@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "public_post_table")
 data class PublicPost(
-    @PrimaryKey(autoGenerate = true)
-    var publicPostId: Int = 1,
-    var employeeName: String? = null,
-    var dateAndTime: String? = null,
-    var post: String? = null
+    @PrimaryKey(autoGenerate = false)
+    var publicPostId: Int = 0,
+    var employeeName: String? = "",
+    var dateAndTime: String? = "",
+    var post: String? = ""
 )
