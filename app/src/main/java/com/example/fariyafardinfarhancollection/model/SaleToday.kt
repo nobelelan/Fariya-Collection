@@ -17,5 +17,6 @@ data class SaleToday(
     var otherPaymentTotal: String? = "",
     var spentTodayTotal: String? = "",
     var comment: String? = "",
-    var retailAfterSpentMinus: String? = ""
+    var retailAfterSpentMinus: String? = "",
+    var submittedBy: String? = ""
 )

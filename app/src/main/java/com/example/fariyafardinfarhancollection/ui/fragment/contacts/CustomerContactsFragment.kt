@@ -25,6 +25,7 @@ import com.example.fariyafardinfarhancollection.verifyCustomerInformation
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
@@ -74,7 +75,9 @@ class CustomerContactsFragment : Fragment() {
 //            }
 //        }
 
-        contactsCollectionRef.addSnapshotListener { value, error ->
+        contactsCollectionRef
+            .orderBy("ccId", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
             error?.let {
                 Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
             }

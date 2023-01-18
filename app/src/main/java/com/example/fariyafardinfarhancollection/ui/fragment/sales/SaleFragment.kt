@@ -24,10 +24,14 @@ import com.example.fariyafardinfarhancollection.model.*
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.tasks.await
 import java.util.*
 
 
@@ -55,7 +59,9 @@ class SaleFragment : Fragment() {
     private var databaseWholesaleCountCounter: Int? = null
     private var databaseOtherPaymentCounter: Int? = null
     private var databaseSpentTodayCounter: Int? = null
-    private var databaseSaleCounter: Int? = null
+
+    private lateinit var auth: FirebaseAuth
+    private var currentEmployee: Employee? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,6 +75,12 @@ class SaleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSaleBinding.bind(view)
+
+        auth = Firebase.auth
+        Firebase.firestore.collection("registeredEmployees").document(auth.currentUser!!.uid)
+            .get().addOnSuccessListener {
+            currentEmployee = it.toObject<Employee>()
+        }
 
         val shopDao = ShopDatabase.getDatabase(requireContext()).shopDao()
         val shopRepository = ShopRepository(shopDao)
@@ -601,58 +613,87 @@ class SaleFragment : Fragment() {
     private fun submitDataIntoSales() {
 
         binding.btnSubmitData.setOnClickListener {
+            var retailSaleText = ""
+            var otherPaymentText = ""
+            var wholesaleText = ""
+            var spentTodayText = ""
+
+            binding.btnSubmitData.isEnabled = false
             val builder = AlertDialog.Builder(requireContext())
             builder.setTitle("Confirm Submission")
-            builder.setNegativeButton("Cancel"){_,_->}
+            builder.setNegativeButton("Cancel"){_,_->
+                binding.btnSubmitData.isEnabled = true
+            }
             builder.setPositiveButton("Submit"){_,_->
                 var retailSale = listOf<ProductCount>()
                 var wholesale = listOf<WholesaleCount>()
                 var otherPayment = listOf<OtherPaymentReceived>()
                 var spentToday = listOf<SpentToday>()
-                shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
-                    it?.let {
-                        retailSale = it
+//                shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+//                    it?.let {
+//                        retailSale = it
+//                    }
+//                })
+                productCountCollectionRef.orderBy("pcId").get().addOnSuccessListener { querySnapshot->
+                    querySnapshot?.let {
+                        retailSale = it.toObjects<ProductCount>()
                     }
-                })
-                shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
-                    it?.let {
-                        wholesale = it
+                }.addOnSuccessListener {
+                    var productCountCounter = 1
+                    retailSale.forEach {
+                        retailSaleText += "$productCountCounter    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                        productCountCounter += 1
                     }
-                })
-                shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
-                    it?.let {
-                        otherPayment = it
+                }
+//                shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
+//                    it?.let {
+//                        wholesale = it
+//                    }
+//                })
+                wholesaleCountCollectionRef.orderBy("wsId").get().addOnSuccessListener { querySnapshot->
+                    querySnapshot?.let {
+                        wholesale = it.toObjects<WholesaleCount>()
                     }
-                })
-                shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
-                    it?.let {
-                        spentToday = it
+                }.addOnSuccessListener {
+                    var wholesaleCounter = 1
+                    wholesale.forEach {
+                        wholesaleText += "$wholesaleCounter    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
+                        wholesaleCounter += 1
                     }
-                })
-                var retailSaleText = ""
-                var retailCounter = 1
-                retailSale.forEach {
-                    retailSaleText += "$retailCounter    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
-                    retailCounter += 1
                 }
-                var wholesaleText = ""
-                var wholesaleCounter = 1
-                wholesale.forEach {
-                    wholesaleText += "$wholesaleCounter    ${it.name}    ${it.quantity}    *    ${it.price}    =    ${it.total}\n"
-                    wholesaleCounter += 1
+//                shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+//                    it?.let {
+//                        otherPayment = it
+//                    }
+//                })
+                otherPaymentCollectionRef.orderBy("otherPaymentId").get().addOnSuccessListener { querySnapshot->
+                    querySnapshot?.let {
+                        otherPayment = it.toObjects<OtherPaymentReceived>()
+                    }
+                }.addOnSuccessListener {
+                    var otherPaymentCounter = 1
+                    otherPayment.forEach {
+                        otherPaymentText += "$otherPaymentCounter    ${it.senderName}    (${it.paymentMethod})    =    ${it.amount}\n"
+                        otherPaymentCounter += 1
+                    }
                 }
-                var otherPaymentText = ""
-                var otherPaymentCounter = 1
-                otherPayment.forEach {
-                    otherPaymentText += "$otherPaymentCounter    ${it.senderName}    (${it.paymentMethod})    =    ${it.amount}\n"
-                    otherPaymentCounter += 1
+//                shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+//                    it?.let {
+//                        spentToday = it
+//                    }
+//                })
+                spentTodayCollectionRef.orderBy("spentTodayId").get().addOnSuccessListener { querySnapshot->
+                    querySnapshot?.let {
+                        spentToday = it.toObjects<SpentToday>()
+                    }
+                }.addOnSuccessListener {
+                    var spentTodayCounter = 1
+                    spentToday.forEach {
+                        spentTodayText += "$spentTodayCounter    ${it.reason}    =    ${it.amount}\n"
+                        spentTodayCounter += 1
+                    }
                 }
-                var spentTodayText = ""
-                var spentTodayCounter = 1
-                spentToday.forEach {
-                    spentTodayText += "$spentTodayCounter    ${it.reason}    =    ${it.amount}\n"
-                    spentTodayCounter += 1
-                }
+
                 Firebase.firestore.runTransaction { transaction->
                     val counterRef = counterCollectionRef.document("saleTodayCounter")
                     val counter = transaction.get(counterRef)
@@ -672,7 +713,8 @@ class SaleFragment : Fragment() {
                         otherPaymentTotal = " = ${binding.txtOtherPaymentTotal.text} ",
                         spentTodayTotal = " = ${binding.txtSpentAmountTotal.text} ",
                         comment = " Comment: \n ${binding.edtComment.text}",
-                        retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
+                        retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}",
+                        submittedBy = "${currentEmployee?.username}"
                     ))
                     null
                 }.addOnSuccessListener {
@@ -690,8 +732,10 @@ class SaleFragment : Fragment() {
                         comment = " Comment: \n ${binding.edtComment.text}",
                         retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
                     ))*/
+                    binding.btnSubmitData.isEnabled = true
                     Toast.makeText(requireContext(), "Record Saved Successfully!", Toast.LENGTH_SHORT).show()
                 }.addOnFailureListener {
+                    binding.btnSubmitData.isEnabled = true
                     Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
                 }
             }

@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -14,10 +15,15 @@ import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.SwipeToDelete
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentRecordsBinding
+import com.example.fariyafardinfarhancollection.model.SaleToday
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.ktx.Firebase
 
 
 class RecordsFragment : Fragment() {
@@ -28,6 +34,8 @@ class RecordsFragment : Fragment() {
     private val salesAdapter by lazy { SalesAdapter() }
 
     private lateinit var shopViewModel: ShopViewModel
+
+    private val recordsCollectionRef = Firebase.firestore.collection("saleTodays")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,9 +56,23 @@ class RecordsFragment : Fragment() {
 
         setUpRecyclerView()
 
-        shopViewModel.getAllSaleToday.observe(viewLifecycleOwner, Observer {
-            salesAdapter.differ.submitList(it)
-        })
+//        shopViewModel.getAllSaleToday.observe(viewLifecycleOwner, Observer {
+//            salesAdapter.differ.submitList(it)
+//        })
+
+        recordsCollectionRef
+            .orderBy("saleId", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
+                error?.let {
+                    Toast.makeText(requireContext(), "Something went wrong", Toast.LENGTH_SHORT).show()
+                }
+                value?.let { querySnapshot ->
+                    if (querySnapshot.documents.isNotEmpty()){
+                        val saleTodayList = querySnapshot.toObjects<SaleToday>()
+                        salesAdapter.differ.submitList(saleTodayList)
+                    }
+                }
+            }
     }
 
     private fun setUpRecyclerView() {

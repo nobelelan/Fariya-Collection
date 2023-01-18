@@ -43,6 +43,7 @@ class SalesAdapter: RecyclerView.Adapter<SalesAdapter.SalesViewHolder>() {
             txtSpentTodayTotal.text = saleToday.spentTodayTotal
             txtComment.text = saleToday.comment
             txtRetailAfterSpentMinus.text = saleToday.retailAfterSpentMinus
+            txtSubmittedBy.text = saleToday.submittedBy
         }
     }
 

@@ -44,6 +44,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
@@ -113,7 +114,9 @@ class ExtraFragment : Fragment() {
 
         setImagesFromStorage()
 
-        publicPostsCollectionRef.addSnapshotListener { value, error ->
+        publicPostsCollectionRef
+            .orderBy("publicPostId", Query.Direction.DESCENDING)
+            .addSnapshotListener { value, error ->
             error?.let {
                 Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
             }
