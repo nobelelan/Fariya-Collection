@@ -57,7 +57,6 @@ class OtherPaymentReceivedAdapter :
             val amount = holder.binding.edtAmount.text.toString()
             if (verifyProductCountDataFromUser(senderName, paymentMethod, amount)){
                 updateItemListener?.updateProductCount(otherPaymentReceived.otherPaymentId, senderName, paymentMethod, amount)
-                Toast.makeText(holder.itemView.context, "Payment Updated!", Toast.LENGTH_SHORT).show()
             }else{
                 Toast.makeText(holder.itemView.context, "Fill out all the fields!", Toast.LENGTH_SHORT).show()
             }

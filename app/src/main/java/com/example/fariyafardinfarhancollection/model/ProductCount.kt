@@ -5,10 +5,10 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "product_count_table")
 data class ProductCount(
-    @PrimaryKey(autoGenerate = true)
-    var pcId: Int = 1,
-    var name: String? = null,
-    var quantity: String? = null,
-    var price: String? = null,
-    var total: String? = null
+    @PrimaryKey(autoGenerate = false)
+    var pcId: Int = 0,
+    var name: String? = "",
+    var quantity: String? = "",
+    var price: String? = "",
+    var total: String? = ""
 )

@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "other_payment_received_table")
 data class OtherPaymentReceived(
-    @PrimaryKey(autoGenerate = true)
-    var otherPaymentId: Int = 1,
-    var senderName: String? = null,
-    val paymentMethod: String? = null,
-    val amount: String? = null
+    @PrimaryKey(autoGenerate = false)
+    var otherPaymentId: Int = 0,
+    var senderName: String? = "",
+    val paymentMethod: String? = "",
+    val amount: String? = ""
 )

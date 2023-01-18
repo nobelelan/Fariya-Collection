@@ -24,7 +24,10 @@ import com.example.fariyafardinfarhancollection.model.*
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
-import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObjects
+import com.google.firebase.ktx.Firebase
 import java.util.*
 
 
@@ -39,6 +42,20 @@ class SaleFragment : Fragment() {
     private val spentTodayAdapter by lazy { SpentTodayAdapter() }
 
     private lateinit var shopViewModel: ShopViewModel
+
+    private val counterCollectionRef = Firebase.firestore.collection("allCounters")
+    private val saleTodayCollectionRef = Firebase.firestore.collection("saleTodays")
+    private val productCountCollectionRef = Firebase.firestore.collection("productCounts")
+    private val wholesaleCountCollectionRef = Firebase.firestore.collection("wholesaleCounts")
+    private val otherPaymentCollectionRef = Firebase.firestore.collection("otherPayments")
+    private val spentTodayCollectionRef = Firebase.firestore.collection("spentTodays")
+
+    private var databaseSaleTodayCounter: Int? = null
+    private var databaseProductCountCounter: Int? = null
+    private var databaseWholesaleCountCounter: Int? = null
+    private var databaseOtherPaymentCounter: Int? = null
+    private var databaseSpentTodayCounter: Int? = null
+    private var databaseSaleCounter: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -65,75 +82,180 @@ class SaleFragment : Fragment() {
         setUpCurrentDate()
         submitDataIntoSales()
 
-        shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty()){
-                for (i in 1..10){
-                    shopViewModel.insertProductCount(ProductCount(0))
-                }
-            }
-            salesProductCountAdapter.differ.submitList(it)
-        })
-        shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty()){
-                for (i in 1..4){
-                    shopViewModel.insertWholesaleCount(WholesaleCount(0))
-                }
-            }else{
-                salesWholesaleCountAdapter.differ.submitList(it)
-            }
-        })
-        shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty()){
-                for (i in 1..3){
-                    shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
-                }
-            }else{
-                otherPaymentReceivedAdapter.differ.submitList(it)
-            }
-        })
-        shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
-            if (it.isEmpty()){
-                for (i in 1..3){
-                    shopViewModel.insertSpentToday(SpentToday(0))
-                }
-            }else{
-                spentTodayAdapter.differ.submitList(it)
-            }
-        })
+//        shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+//            if (it.isEmpty()){
+//                for (i in 1..10){
+//                    shopViewModel.insertProductCount(ProductCount(0))
+//                }
+//            }
+//            salesProductCountAdapter.differ.submitList(it)
+//        })
+        setUpProductCount()
+
+//        shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
+//            if (it.isEmpty()){
+//                for (i in 1..4){
+//                    shopViewModel.insertWholesaleCount(WholesaleCount(0))
+//                }
+//            }else{
+//                salesWholesaleCountAdapter.differ.submitList(it)
+//            }
+//        })
+        setUpWholesaleCount()
+
+//        shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+//            if (it.isEmpty()){
+//                for (i in 1..3){
+//                    shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
+//                }
+//            }else{
+//                otherPaymentReceivedAdapter.differ.submitList(it)
+//            }
+//        })
+        setUpOtherPaymentReceived()
+
+//        shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+//            if (it.isEmpty()){
+//                for (i in 1..3){
+//                    shopViewModel.insertSpentToday(SpentToday(0))
+//                }
+//            }else{
+//                spentTodayAdapter.differ.submitList(it)
+//            }
+//        })
+        setUpSpentToday()
 
         salesProductCountAdapter.setUpdateItemListener(object : SalesProductCountAdapter.UpdateItemListener{
             override fun updateProductCount(id: Int, name: String, quantity: String, price: String, total: String) {
-                shopViewModel.updateProductCount(ProductCount(id, name, quantity, price, total))
+                productCountCollectionRef
+                    .whereEqualTo("pcId", id)
+//                    .whereEqualTo("name", name)
+//                    .whereEqualTo("quantity", quantity)
+//                    .whereEqualTo("price", price)
+//                    .whereEqualTo("total", total)
+                    .get()
+                    .addOnSuccessListener { querySnapshot->
+                        if (querySnapshot.documents.isNotEmpty()){
+                            querySnapshot.forEach { documentSnapshot->
+                                Firebase.firestore.runTransaction { transaction->
+                                    val productCountRef = productCountCollectionRef.document(documentSnapshot.id)
+                                    transaction.get(productCountRef)
+                                    transaction.update(productCountRef, "name", name)
+                                    transaction.update(productCountRef, "quantity", quantity)
+                                    transaction.update(productCountRef, "price", price)
+                                    transaction.update(productCountRef, "total", total)
+                                    null
+                                }.addOnSuccessListener {
+//                                    shopViewModel.updateProductCount(ProductCount(id, name, quantity, price, total))
+                                    Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                }.addOnFailureListener{
+                                    Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
             }
         })
         salesWholesaleCountAdapter.setUpdateItemListener(object : SalesWholesaleCountAdapter.UpdateItemListener{
             override fun updateProductCount(id: Int, name: String, quantity: String, price: String, total: String) {
-                shopViewModel.updateWholesaleCount(WholesaleCount(id, name, quantity, price, total))
+                wholesaleCountCollectionRef
+                    .whereEqualTo("wsId", id)
+//                    .whereEqualTo("name", name)
+//                    .whereEqualTo("quantity", quantity)
+//                    .whereEqualTo("price", price)
+//                    .whereEqualTo("total", total)
+                    .get()
+                    .addOnSuccessListener { querySnapshot->
+                        if (querySnapshot.documents.isNotEmpty()){
+                            querySnapshot.forEach { documentSnapshot->
+                                Firebase.firestore.runTransaction { transaction->
+                                    val wholesaleCountRef = wholesaleCountCollectionRef.document(documentSnapshot.id)
+                                    transaction.get(wholesaleCountRef)
+                                    transaction.update(wholesaleCountRef, "name", name)
+                                    transaction.update(wholesaleCountRef, "quantity", quantity)
+                                    transaction.update(wholesaleCountRef, "price", price)
+                                    transaction.update(wholesaleCountRef, "total", total)
+                                    null
+                                }.addOnSuccessListener {
+//                                    shopViewModel.updateWholesaleCount(WholesaleCount(id, name, quantity, price, total))
+                                    Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                }.addOnFailureListener{
+                                    Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
             }
         })
         otherPaymentReceivedAdapter.setUpdateItemListener(object : OtherPaymentReceivedAdapter.UpdateItemListener{
             override fun updateProductCount(otherPaymentId: Int, senderName: String, paymentMethod: String, amount: String) {
-                shopViewModel.updateOtherPaymentReceived(OtherPaymentReceived(otherPaymentId, senderName, paymentMethod, amount))
+                otherPaymentCollectionRef
+                    .whereEqualTo("otherPaymentId", otherPaymentId)
+//                    .whereEqualTo("senderName", senderName)
+//                    .whereEqualTo("paymentMethod", paymentMethod)
+//                    .whereEqualTo("amount", amount)
+                    .get()
+                    .addOnSuccessListener { querySnapshot->
+                        if (querySnapshot.documents.isNotEmpty()){
+                            querySnapshot.forEach { documentSnapshot->
+                                Firebase.firestore.runTransaction { transaction->
+                                    val otherPaymentRef = otherPaymentCollectionRef.document(documentSnapshot.id)
+                                    transaction.get(otherPaymentRef)
+                                    transaction.update(otherPaymentRef, "senderName", senderName)
+                                    transaction.update(otherPaymentRef, "paymentMethod", paymentMethod)
+                                    transaction.update(otherPaymentRef, "amount", amount)
+                                    null
+                                }.addOnSuccessListener {
+//                                    shopViewModel.updateOtherPaymentReceived(OtherPaymentReceived(otherPaymentId, senderName, paymentMethod, amount))
+                                    Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                }.addOnFailureListener{
+                                    Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
             }
         })
         spentTodayAdapter.setUpdateItemListener(object : SpentTodayAdapter.UpdateItemListener{
             override fun updateProductCount(spentTodayId: Int, reason: String, amount: String) {
-                shopViewModel.updateSpentToday(SpentToday(spentTodayId, reason, amount))
+                spentTodayCollectionRef
+                    .whereEqualTo("spentTodayId", spentTodayId)
+//                    .whereEqualTo("reason", reason)
+//                    .whereEqualTo("amount", amount)
+                    .get()
+                    .addOnSuccessListener { querySnapshot->
+                        if (querySnapshot.documents.isNotEmpty()){
+                            querySnapshot.forEach { documentSnapshot->
+                                Firebase.firestore.runTransaction { transaction->
+                                    val spentTodayRef = spentTodayCollectionRef.document(documentSnapshot.id)
+                                    transaction.get(spentTodayRef)
+                                    transaction.update(spentTodayRef, "reason", reason)
+                                    transaction.update(spentTodayRef, "amount", amount)
+                                    null
+                                }.addOnSuccessListener {
+//                                    shopViewModel.updateSpentToday(SpentToday(spentTodayId, reason, amount))
+                                    Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
+                                }.addOnFailureListener{
+                                    Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
+                    }
             }
         })
 
-        binding.txtRetailTotal.setOnClickListener {
-            setTotalRetailSale()
-        }
-        binding.txtWholesaleTotal.setOnClickListener {
-            setTotalWholesale()
-        }
-        binding.txtOtherPaymentTotal.setOnClickListener {
-            setTotalOtherPayment()
-        }
-        binding.txtSpentAmountTotal.setOnClickListener {
-            setTotalSpentToday()
-        }
+//        binding.txtRetailTotal.setOnClickListener {
+//            setTotalRetailSale()
+//        }
+//        binding.txtWholesaleTotal.setOnClickListener {
+//            setTotalWholesale()
+//        }
+//        binding.txtOtherPaymentTotal.setOnClickListener {
+//            setTotalOtherPayment()
+//        }
+//        binding.txtSpentAmountTotal.setOnClickListener {
+//            setTotalSpentToday()
+//        }
         binding.txtRetailTotalAfterMinusSpentToday.setOnClickListener {
             if (binding.txtRetailTotal.text.toString() != " Total " && binding.txtSpentAmountTotal.text.toString() != " Total "){
                 val spentAmount = binding.txtSpentAmountTotal.text.toString().toInt()
@@ -168,27 +290,223 @@ class SaleFragment : Fragment() {
 
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun setTotalSpentToday() {
-        val totalSpentToday = arrayListOf<Int>()
-        shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
-            it.forEach { spentToday ->
-                spentToday.amount?.let { amount -> totalSpentToday.add(amount.toInt()) }
+    private fun setUpSpentToday(){
+        spentTodayCollectionRef
+            .orderBy("spentTodayId")
+            .addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
             }
-        })
-        binding.txtSpentAmountTotal.text = totalSpentToday.sum().toString()
+            value?.let { querySnapshot ->
+                if (querySnapshot.documents.isNotEmpty()){
+                    val spentTodayList = querySnapshot.toObjects<SpentToday>()
+                    spentTodayAdapter.differ.submitList(spentTodayList)
+                    binding.txtSpentAmountTotal.setOnClickListener {
+                        val strings =  arrayListOf<String>()
+                        val spentTodayTotal =  arrayListOf<Int>()
+                        spentTodayList.forEach { spentToday ->
+                            spentToday.amount?.let { subTotal-> strings.add(subTotal) }
+                        }
+                        strings.forEach { each->
+                            if (each.isNotEmpty() && each != "=" ){
+                                spentTodayTotal.add(each.toInt())
+                            }
+                        }
+                        binding.txtSpentAmountTotal.text = spentTodayTotal.sum().toString()
+                    }
+                }else{
+                    insertSpentToday()
+                }
+            }
+        }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun setTotalOtherPayment() {
-        val totalOtherPaymentReceived = arrayListOf<Int>()
-        shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
-            it.forEach { otherPaymentReceived ->
-                otherPaymentReceived.amount?.let { amount -> totalOtherPaymentReceived.add(amount.toInt()) }
-            }
-        })
-        binding.txtOtherPaymentTotal.text = totalOtherPaymentReceived.sum().toString()
+    private fun insertSpentToday(){
+        Firebase.firestore.runTransaction { transaction->
+            val counterRef = counterCollectionRef.document("spentTodayCounter")
+            val counter = transaction.get(counterRef)
+            val newCounter = counter["spentTodayId"] as Long + 1
+            databaseSpentTodayCounter = newCounter.toInt()
+            transaction.update(counterRef, "spentTodayId", newCounter)
+            spentTodayCollectionRef.document().set(SpentToday(newCounter.toInt(), ))
+            null
+        }.addOnSuccessListener {
+            Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewSpentAmount.isEnabled = true
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Insertion failed!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewSpentAmount.isEnabled = true
+        }
     }
+
+    private fun setUpOtherPaymentReceived(){
+        otherPaymentCollectionRef
+            .orderBy("otherPaymentId")
+            .addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            value?.let { querySnapshot ->
+                if (querySnapshot.documents.isNotEmpty()){
+                    val otherPaymentList = querySnapshot.toObjects<OtherPaymentReceived>()
+                    otherPaymentReceivedAdapter.differ.submitList(otherPaymentList)
+                    binding.txtOtherPaymentTotal.setOnClickListener {
+                        val strings =  arrayListOf<String>()
+                        val otherPaymentTotal =  arrayListOf<Int>()
+                        otherPaymentList.forEach { otherPayment ->
+                            otherPayment.amount?.let { subTotal-> strings.add(subTotal) }
+                        }
+                        strings.forEach { each->
+                            if (each.isNotEmpty() && each != "=" ){
+                                otherPaymentTotal.add(each.toInt())
+                            }
+                        }
+                        binding.txtOtherPaymentTotal.text = otherPaymentTotal.sum().toString()
+                    }
+                }else{
+                    insertOtherPayment()
+                }
+            }
+        }
+    }
+
+    private fun insertOtherPayment(){
+        Firebase.firestore.runTransaction { transaction->
+            val counterRef = counterCollectionRef.document("otherPaymentCounter")
+            val counter = transaction.get(counterRef)
+            val newCounter = counter["otherPaymentId"] as Long + 1
+            databaseOtherPaymentCounter = newCounter.toInt()
+            transaction.update(counterRef, "otherPaymentId", newCounter)
+            otherPaymentCollectionRef.document().set(OtherPaymentReceived(newCounter.toInt()))
+            null
+        }.addOnSuccessListener {
+            Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewOtherPayment.isEnabled = true
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Insertion failed!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewOtherPayment.isEnabled = true
+        }
+    }
+
+    private fun setUpWholesaleCount(){
+        wholesaleCountCollectionRef
+            .orderBy("wsId")
+            .addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            value?.let { querySnapshot ->
+                if (querySnapshot.documents.isNotEmpty()){
+                    val wholesaleCountList = querySnapshot.toObjects<WholesaleCount>()
+                    salesWholesaleCountAdapter.differ.submitList(wholesaleCountList)
+                    binding.txtWholesaleTotal.setOnClickListener {
+                        val strings =  arrayListOf<String>()
+                        val totalWholesale =  arrayListOf<Int>()
+                        wholesaleCountList.forEach { wholesaleCount ->
+                            wholesaleCount.total?.let { subTotal-> strings.add(subTotal) }
+                        }
+                        strings.forEach { each->
+                            if (each.isNotEmpty() && each != "=" ){
+                                totalWholesale.add(each.toInt())
+                            }
+                        }
+                        binding.txtWholesaleTotal.text = totalWholesale.sum().toString()
+                    }
+                }else{
+                    insertWholesaleCount()
+                }
+            }
+        }
+    }
+
+    private fun insertWholesaleCount(){
+        Firebase.firestore.runTransaction { transaction->
+            val counterRef = counterCollectionRef.document("wholesaleCountCounter")
+            val counter = transaction.get(counterRef)
+            val newCounter = counter["wsId"] as Long + 1
+            databaseWholesaleCountCounter = newCounter.toInt()
+            transaction.update(counterRef, "wsId", newCounter)
+            wholesaleCountCollectionRef.document().set(WholesaleCount(newCounter.toInt(), total = "="))
+            null
+        }.addOnSuccessListener {
+            Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewWholesaleItem.isEnabled = true
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Insertion failed!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewWholesaleItem.isEnabled = true
+        }
+    }
+
+    private fun setUpProductCount(){
+        productCountCollectionRef
+            .orderBy("pcId")
+            .addSnapshotListener { value, error ->
+            error?.let {
+                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+            }
+            value?.let { querySnapshot ->
+                if (querySnapshot.documents.isNotEmpty()){
+                    val productCountList = querySnapshot.toObjects<ProductCount>()
+                    salesProductCountAdapter.differ.submitList(productCountList)
+                    binding.txtRetailTotal.setOnClickListener {
+                        val strings =  arrayListOf<String>()
+                        val totalRetailSale =  arrayListOf<Int>()
+                        productCountList.forEach { productCount ->
+                            productCount.total?.let { subTotal-> strings.add(subTotal) }
+                        }
+                        strings.forEach { each->
+                            if (each.isNotEmpty() && each != "=" ){
+                                totalRetailSale.add(each.toInt())
+                            }
+                        }
+                        binding.txtRetailTotal.text = totalRetailSale.sum().toString()
+                    }
+                }else{
+                    insertProductCount()
+                }
+            }
+        }
+    }
+
+    private fun insertProductCount(){
+        Firebase.firestore.runTransaction { transaction->
+            val counterRef = counterCollectionRef.document("productCountCounter")
+            val counter = transaction.get(counterRef)
+            val newCounter = counter["pcId"] as Long + 1
+            databaseProductCountCounter = newCounter.toInt()
+            transaction.update(counterRef, "pcId", newCounter)
+            productCountCollectionRef.document().set(ProductCount(newCounter.toInt(), total = "="))
+            null
+        }.addOnSuccessListener {
+            Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewProductItem.isEnabled = true
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Insertion failed!", Toast.LENGTH_SHORT).show()
+            binding.btnAddNewProductItem.isEnabled = true
+        }
+    }
+
+//    @SuppressLint("SetTextI18n")
+//    private fun setTotalSpentToday() {
+//        val totalSpentToday = arrayListOf<Int>()
+//        shopViewModel.getAllSpentToday.observe(viewLifecycleOwner, Observer {
+//            it.forEach { spentToday ->
+//                spentToday.amount?.let { amount -> totalSpentToday.add(amount.toInt()) }
+//            }
+//        })
+//        binding.txtSpentAmountTotal.text = totalSpentToday.sum().toString()
+//    }
+
+//    @SuppressLint("SetTextI18n")
+//    private fun setTotalOtherPayment() {
+//        val totalOtherPaymentReceived = arrayListOf<Int>()
+//        shopViewModel.getAllOtherPaymentReceived.observe(viewLifecycleOwner, Observer {
+//            it.forEach { otherPaymentReceived ->
+//                otherPaymentReceived.amount?.let { amount -> totalOtherPaymentReceived.add(amount.toInt()) }
+//            }
+//        })
+//        binding.txtOtherPaymentTotal.text = totalOtherPaymentReceived.sum().toString()
+//    }
 
     private fun setUpSpentTodayRecyclerView() {
         val rvSpentToday = binding.rvSpentAmount
@@ -209,7 +527,9 @@ class SaleFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(rvSpentToday)*/
 
         binding.btnAddNewSpentAmount.setOnClickListener {
-            shopViewModel.insertSpentToday(SpentToday(0))
+            binding.btnAddNewSpentAmount.isEnabled = false
+//            shopViewModel.insertSpentToday(SpentToday(0))
+            insertSpentToday()
         }
     }
 
@@ -232,7 +552,9 @@ class SaleFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(rvOtherPayment)*/
 
         binding.btnAddNewOtherPayment.setOnClickListener {
-            shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
+            binding.btnAddNewOtherPayment.isEnabled = false
+//            shopViewModel.insertOtherPaymentReceived(OtherPaymentReceived(0))
+            insertOtherPayment()
         }
     }
 
@@ -264,16 +586,16 @@ class SaleFragment : Fragment() {
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun setTotalWholesale() {
-        val totalWholesale = arrayListOf<Int>()
-        shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
-            it.forEach { wholesaleCount ->
-                wholesaleCount.total?.let { subTotal -> totalWholesale.add(subTotal.toInt()) }
-            }
-        })
-        binding.txtWholesaleTotal.text = totalWholesale.sum().toString()
-    }
+//    @SuppressLint("SetTextI18n")
+//    private fun setTotalWholesale() {
+//        val totalWholesale = arrayListOf<Int>()
+//        shopViewModel.getAllWholesaleCount.observe(viewLifecycleOwner, Observer {
+//            it.forEach { wholesaleCount ->
+//                wholesaleCount.total?.let { subTotal -> totalWholesale.add(subTotal.toInt()) }
+//            }
+//        })
+//        binding.txtWholesaleTotal.text = totalWholesale.sum().toString()
+//    }
 
 
     private fun submitDataIntoSales() {
@@ -331,21 +653,47 @@ class SaleFragment : Fragment() {
                     spentTodayText += "$spentTodayCounter    ${it.reason}    =    ${it.amount}\n"
                     spentTodayCounter += 1
                 }
-                shopViewModel.insertSaleToday(SaleToday(
-                    saleId = 0,
-                    date = binding.txtCurrentDate.text.toString(),
-                    retailSale = retailSaleText,
-                    wholesale = wholesaleText,
-                    wholesaleTotal = " = ${binding.txtWholesaleTotal.text} ",
-                    retailTotal = " = ${binding.txtRetailTotal.text} ",
-                    otherPayment = otherPaymentText,
-                    spentToday = spentTodayText,
-                    otherPaymentTotal = " = ${binding.txtOtherPaymentTotal.text} ",
-                    spentTodayTotal = " = ${binding.txtSpentAmountTotal.text} ",
-                    comment = " Comment: \n ${binding.edtComment.text}",
-                    retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
-                ))
-                Toast.makeText(requireContext(), "Record Saved Successfully!", Toast.LENGTH_SHORT).show()
+                Firebase.firestore.runTransaction { transaction->
+                    val counterRef = counterCollectionRef.document("saleTodayCounter")
+                    val counter = transaction.get(counterRef)
+                    val newCounter = counter["saleId"] as Long + 1
+                    databaseSaleTodayCounter = newCounter.toInt()
+                    transaction.update(counterRef,"saleId", newCounter)
+
+                    saleTodayCollectionRef.document().set(SaleToday(
+                        saleId = newCounter.toInt(),
+                        date = binding.txtCurrentDate.text.toString(),
+                        retailSale = retailSaleText,
+                        wholesale = wholesaleText,
+                        wholesaleTotal = " = ${binding.txtWholesaleTotal.text} ",
+                        retailTotal = " = ${binding.txtRetailTotal.text} ",
+                        otherPayment = otherPaymentText,
+                        spentToday = spentTodayText,
+                        otherPaymentTotal = " = ${binding.txtOtherPaymentTotal.text} ",
+                        spentTodayTotal = " = ${binding.txtSpentAmountTotal.text} ",
+                        comment = " Comment: \n ${binding.edtComment.text}",
+                        retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
+                    ))
+                    null
+                }.addOnSuccessListener {
+                    /*shopViewModel.insertSaleToday(SaleToday(
+                        saleId = 0,
+                        date = binding.txtCurrentDate.text.toString(),
+                        retailSale = retailSaleText,
+                        wholesale = wholesaleText,
+                        wholesaleTotal = " = ${binding.txtWholesaleTotal.text} ",
+                        retailTotal = " = ${binding.txtRetailTotal.text} ",
+                        otherPayment = otherPaymentText,
+                        spentToday = spentTodayText,
+                        otherPaymentTotal = " = ${binding.txtOtherPaymentTotal.text} ",
+                        spentTodayTotal = " = ${binding.txtSpentAmountTotal.text} ",
+                        comment = " Comment: \n ${binding.edtComment.text}",
+                        retailAfterSpentMinus = " Retail - Spent Money = ${binding.txtRetailTotalAfterMinusSpentToday.text}"
+                    ))*/
+                    Toast.makeText(requireContext(), "Record Saved Successfully!", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener {
+                    Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                }
             }
             builder.create().show()
         }
@@ -370,19 +718,21 @@ class SaleFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(rvWholeSaleItems)*/
 
         binding.btnAddNewWholesaleItem.setOnClickListener {
-            shopViewModel.insertWholesaleCount(WholesaleCount(0))
+            binding.btnAddNewWholesaleItem.isEnabled = false
+//            shopViewModel.insertWholesaleCount(WholesaleCount(0))
+            insertWholesaleCount()
         }
     }
 
-    private fun setTotalRetailSale() {
-        val totalRetailSale = arrayListOf<Int>()
-        shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
-            it.forEach { productCount ->
-                productCount.total?.let { subTotal -> totalRetailSale.add(subTotal.toInt()) }
-            }
-        })
-        binding.txtRetailTotal.text = totalRetailSale.sum().toString()
-    }
+//    private fun setTotalRetailSale() {
+//        val totalRetailSale = arrayListOf<Int>()
+//        shopViewModel.getAllProductCount.observe(viewLifecycleOwner, Observer {
+//            it.forEach { productCount ->
+//                productCount.total?.let { subTotal -> totalRetailSale.add(subTotal.toInt()) }
+//            }
+//        })
+//        binding.txtRetailTotal.text = totalRetailSale.sum().toString()
+//    }
 
     private fun setUpRetailSalesRecyclerView() {
         val rvRetailItems = binding.rvRetailItems
@@ -403,7 +753,9 @@ class SaleFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(rvRetailItems)*/
 
         binding.btnAddNewProductItem.setOnClickListener {
-            shopViewModel.insertProductCount(ProductCount(0))
+            binding.btnAddNewProductItem.isEnabled = false
+//            shopViewModel.insertProductCount(ProductCount(0))
+            insertProductCount()
         }
     }
 

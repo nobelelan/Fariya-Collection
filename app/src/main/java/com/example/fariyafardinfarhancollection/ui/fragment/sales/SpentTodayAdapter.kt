@@ -57,7 +57,6 @@ class SpentTodayAdapter :
             val amount = holder.binding.edtAmount.text.toString()
             if (verifyProductCountDataFromUser(reason, amount, amount)){
                 updateItemListener?.updateProductCount(spentToday.spentTodayId, reason, amount)
-                Toast.makeText(holder.itemView.context, "Spent Money Updated!", Toast.LENGTH_SHORT).show()
             }else{
                 Toast.makeText(holder.itemView.context, "Fill out all the fields!", Toast.LENGTH_SHORT).show()
             }
