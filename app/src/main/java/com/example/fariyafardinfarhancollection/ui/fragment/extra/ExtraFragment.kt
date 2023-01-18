@@ -77,7 +77,7 @@ class ExtraFragment : Fragment() {
     val imageReference = Firebase.storage.reference
 
     private val publicPostsCollectionRef = Firebase.firestore.collection("publicPosts")
-    private val publicPostsCounterCollectionRef = Firebase.firestore.collection("publicPostsCounter")
+    private val publicPostsCounterCollectionRef = Firebase.firestore.collection("allCounters")
 
     private var databasePostsCounter: Int? = null
 
@@ -342,7 +342,7 @@ class ExtraFragment : Fragment() {
             }
 
             Firebase.firestore.runTransaction { transaction->
-                val counterRef = publicPostsCounterCollectionRef.document("counter")
+                val counterRef = publicPostsCounterCollectionRef.document("publicPostsCounter")
                 val counter = transaction.get(counterRef)
                 val newCounter = counter["publicPostId"] as Long + 1
                 databasePostsCounter = newCounter.toInt()
@@ -352,6 +352,7 @@ class ExtraFragment : Fragment() {
                 null
             }.addOnSuccessListener {
 //              shopViewModel.insertPublicPost(PublicPost(0, employeeName, dateAndTime, post))
+                binding.edtCreatePost.setText("")
                 Toast.makeText(requireContext(), "Successful!", Toast.LENGTH_SHORT).show()
             }.addOnFailureListener {
                 Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()

@@ -44,7 +44,7 @@ class StorehouseFragment : Fragment() {
     private val storeProductAdapter by lazy { StoreProductAdapter() }
 
     private val storeProductsCollectionRef = Firebase.firestore.collection("storeProducts")
-    private val storeProductsCounterCollectionRef = Firebase.firestore.collection("storeProductsCounter")
+    private val storeProductsCounterCollectionRef = Firebase.firestore.collection("allCounters")
 
     private var databaseContactsCounter: Int? = null
 
@@ -198,7 +198,7 @@ class StorehouseFragment : Fragment() {
                 val wholesalePrice = spBinding.edtWholesalePrice.text.toString()
                 if (verifyProductInformation(productName, quantityLeft, retailPrice, wholesalePrice)){
                     Firebase.firestore.runTransaction { transaction->
-                        val counterRef = storeProductsCounterCollectionRef.document("counter")
+                        val counterRef = storeProductsCounterCollectionRef.document("storeProductsCounter")
                         val counter = transaction.get(counterRef)
                         val newCounter = counter["storeProductId"] as Long + 1
                         databaseContactsCounter = newCounter.toInt()

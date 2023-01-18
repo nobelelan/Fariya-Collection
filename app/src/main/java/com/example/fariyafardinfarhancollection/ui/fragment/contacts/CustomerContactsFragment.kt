@@ -39,7 +39,7 @@ class CustomerContactsFragment : Fragment() {
     private val customerContactAdapter by lazy { CustomerContactAdapter() }
 
     private val contactsCollectionRef = Firebase.firestore.collection("contacts")
-    private val contactsCounterCollectionRef = Firebase.firestore.collection("contactsCounter")
+    private val contactsCounterCollectionRef = Firebase.firestore.collection("allCounters")
 
     private var databaseContactsCounter: Int? = null
 
@@ -206,11 +206,11 @@ class CustomerContactsFragment : Fragment() {
                 val customerDue = ccBinding.edtCustomerDue.text.toString()
                 if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue)){
                     Firebase.firestore.runTransaction { transaction->
-                        val counterRef = contactsCounterCollectionRef.document("counter")
+                        val counterRef = contactsCounterCollectionRef.document("contactsCounter")
                         val counter = transaction.get(counterRef)
-                        val newCounter = counter["counterId"] as Long + 1
+                        val newCounter = counter["ccId"] as Long + 1
                         databaseContactsCounter = newCounter.toInt()
-                        transaction.update(counterRef,"counterId", newCounter)
+                        transaction.update(counterRef,"ccId", newCounter)
 
                         contactsCollectionRef.document().set(CustomerContact(
                             newCounter.toInt(),
