@@ -860,9 +860,10 @@ class SaleFragment : Fragment() {
         }
     }
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+// TODO: if this is set to null, app crashes, try to learn how to fix this
+    
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 }

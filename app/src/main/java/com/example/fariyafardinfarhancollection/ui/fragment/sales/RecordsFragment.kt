@@ -95,8 +95,8 @@ class RecordsFragment : Fragment() {
         itemTouchHelper.attachToRecyclerView(rvSales)
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        _binding = null
+//    }
 }
