@@ -287,13 +287,70 @@ class SaleFragment : Fragment() {
             builder.setMessage("This will remove all of your current data.")
             builder.setNegativeButton("Cancel"){_,_->}
             builder.setPositiveButton("Continue"){_,_->
-                shopViewModel.apply {
-                    Toast.makeText(requireContext(), "Reset Successful!", Toast.LENGTH_SHORT).show()
-                    deleteAllProductCount()
-                    deleteAllWholesaleCount()
-                    deleteAllOtherPaymentReceived()
-                    deleteAllSpentToday()
-                    activity?.onBackPressed()
+//                shopViewModel.apply {
+//                    Toast.makeText(requireContext(), "Reset Successful!", Toast.LENGTH_SHORT).show()
+//                    deleteAllProductCount()
+//                    deleteAllWholesaleCount()
+//                    deleteAllOtherPaymentReceived()
+//                    deleteAllSpentToday()
+//                    activity?.onBackPressed()
+//                }
+                binding.edtComment.setText("")
+                productCountCollectionRef.get().addOnSuccessListener { querySnapshot->
+                    if (querySnapshot.documents.isNotEmpty()){
+                        querySnapshot.forEach { documentSnapshot->
+                            Firebase.firestore.runTransaction { transaction->
+                                val productCountRef = productCountCollectionRef.document(documentSnapshot.id)
+                                transaction.get(productCountRef)
+                                transaction.delete(productCountRef)
+                                null
+                            }.addOnSuccessListener {
+                                binding.txtRetailTotal.text = " Total "
+                            }
+                        }
+                    }
+                }
+                wholesaleCountCollectionRef.get().addOnSuccessListener { querySnapshot->
+                    if (querySnapshot.documents.isNotEmpty()){
+                        querySnapshot.forEach { documentSnapshot->
+                            Firebase.firestore.runTransaction { transaction->
+                                val wholesaleCountRef = wholesaleCountCollectionRef.document(documentSnapshot.id)
+                                transaction.get(wholesaleCountRef)
+                                transaction.delete(wholesaleCountRef)
+                                null
+                            }.addOnSuccessListener {
+                                binding.txtWholesaleTotal.text = " Total "
+                            }
+                        }
+                    }
+                }
+                otherPaymentCollectionRef.get().addOnSuccessListener { querySnapshot->
+                    if (querySnapshot.documents.isNotEmpty()){
+                        querySnapshot.forEach { documentSnapshot->
+                            Firebase.firestore.runTransaction { transaction->
+                                val otherPaymentRef = otherPaymentCollectionRef.document(documentSnapshot.id)
+                                transaction.get(otherPaymentRef)
+                                transaction.delete(otherPaymentRef)
+                                null
+                            }.addOnSuccessListener {
+                                binding.txtOtherPaymentTotal.text = " Total "
+                            }
+                        }
+                    }
+                }
+                spentTodayCollectionRef.get().addOnSuccessListener { querySnapshot->
+                    if (querySnapshot.documents.isNotEmpty()){
+                        querySnapshot.forEach { documentSnapshot->
+                            Firebase.firestore.runTransaction { transaction->
+                                val spentTodayRef = spentTodayCollectionRef.document(documentSnapshot.id)
+                                transaction.get(spentTodayRef)
+                                transaction.delete(spentTodayRef)
+                                null
+                            }.addOnSuccessListener {
+                                binding.txtSpentAmountTotal.text = " Total "
+                            }
+                        }
+                    }
                 }
             }
             builder.create().show()

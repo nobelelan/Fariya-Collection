@@ -79,8 +79,13 @@ class StorehouseFragment : Fragment() {
                 Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
             }
             value?.let {
-                val productList = it.toObjects<StoreProduct>()
-                storeProductAdapter.differ.submitList(productList)
+                if (it.documents.isNotEmpty()){
+                    val productList = it.toObjects<StoreProduct>()
+                    storeProductAdapter.differ.submitList(productList)
+                    binding.txtNoProducts.visibility = View.INVISIBLE
+                }else{
+                    binding.txtNoProducts.visibility = View.VISIBLE
+                }
             }
         }
 

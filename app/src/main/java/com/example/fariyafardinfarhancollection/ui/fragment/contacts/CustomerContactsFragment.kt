@@ -82,8 +82,13 @@ class CustomerContactsFragment : Fragment() {
                 Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
             }
             value?.let {
-                val contactList = it.toObjects<CustomerContact>()
-                customerContactAdapter.differ.submitList(contactList)
+                if (it.documents.isNotEmpty()){
+                    val contactList = it.toObjects<CustomerContact>()
+                    customerContactAdapter.differ.submitList(contactList)
+                    binding.txtNoContacts.visibility = View.INVISIBLE
+                }else{
+                    binding.txtNoContacts.visibility = View.VISIBLE
+                }
             }
         }
 
