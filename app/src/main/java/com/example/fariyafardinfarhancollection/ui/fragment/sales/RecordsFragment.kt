@@ -1,11 +1,10 @@
 package com.example.fariyafardinfarhancollection.ui.fragment.sales
 
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -26,7 +25,7 @@ import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 
 
-class RecordsFragment : Fragment() {
+class RecordsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private var _binding: FragmentRecordsBinding? = null
     private val binding get() = _binding!!
@@ -76,6 +75,38 @@ class RecordsFragment : Fragment() {
                     }
                 }
             }
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_records_fragment, menu)
+        val search = menu.findItem(R.id.menu_search)
+        val searchView = search.actionView as? SearchView
+        searchView?.isSubmitButtonEnabled = true
+        searchView?.setOnQueryTextListener(this)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        if (query != null){
+            searchThroughDatabase(query)
+        }
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if(newText != null){
+            searchThroughDatabase(newText)
+        }
+        return true
+    }
+
+    private fun searchThroughDatabase(query: String){
+        val searchQuery = "%$query%"
+        shopViewModel.searchSaleToday(searchQuery).observe(this, Observer { saleTodayList->
+            saleTodayList?.let {
+                salesAdapter.differ.submitList(it)
+            }
+        })
     }
 
     private fun setUpRecyclerView() {

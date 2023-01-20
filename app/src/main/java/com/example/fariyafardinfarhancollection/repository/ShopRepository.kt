@@ -25,6 +25,7 @@ class ShopRepository(
     fun getAllSaleToday() = shopDao.getAllSaleToday()
     suspend fun insertSaleToday(saleToday: SaleToday) = shopDao.insertSaleToday(saleToday)
     suspend fun deleteSaleToday(saleToday: SaleToday) = shopDao.deleteSaleToday(saleToday)
+    fun searchSaleToday(saleTodayQuery: String) = shopDao.searchSaleToday(saleTodayQuery)
 
     fun getAllOtherPaymentReceived() = shopDao.getAllOtherPaymentReceived()
     suspend fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived) = shopDao.insertOtherPaymentReceived(otherPaymentReceived)

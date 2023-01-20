@@ -89,6 +89,9 @@ class ShopViewModel(
             shopRepository.deleteSaleToday(saleToday)
         }
     }
+    fun searchSaleToday(saleTodayQuery: String): LiveData<List<SaleToday>>{
+        return shopRepository.searchSaleToday(saleTodayQuery)
+    }
 
 
     fun insertOtherPaymentReceived(otherPaymentReceived: OtherPaymentReceived){

@@ -36,6 +36,8 @@ interface ShopDao {
     suspend fun insertSaleToday(saleToday: SaleToday)
     @Delete
     suspend fun deleteSaleToday(saleToday: SaleToday)
+    @Query("SELECT * FROM sale_today_table WHERE date LIKE :saleTodayQuery")
+    fun searchSaleToday(saleTodayQuery: String): LiveData<List<SaleToday>>
 
     @Query("SELECT * FROM other_payment_received_table")
     fun getAllOtherPaymentReceived(): LiveData<List<OtherPaymentReceived>>

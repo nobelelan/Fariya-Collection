@@ -63,6 +63,11 @@ class SaleFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private var currentEmployee: Employee? = null
 
+    private var spentToday = true
+    private var otherPaymentReceived = true
+    private var wholesaleCount = true
+    private var productCount = true
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -384,7 +389,10 @@ class SaleFragment : Fragment() {
                         binding.txtSpentAmountTotal.text = spentTodayTotal.sum().toString()
                     }
                 }else{
-                    insertSpentToday()
+                    if (spentToday){
+
+                        insertSpentToday()
+                    }
                 }
             }
         }
@@ -400,6 +408,7 @@ class SaleFragment : Fragment() {
             spentTodayCollectionRef.document().set(SpentToday(newCounter.toInt(), ))
             null
         }.addOnSuccessListener {
+            spentToday = false
             Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
             binding.btnAddNewSpentAmount.isEnabled = true
         }.addOnFailureListener {
@@ -433,7 +442,9 @@ class SaleFragment : Fragment() {
                         binding.txtOtherPaymentTotal.text = otherPaymentTotal.sum().toString()
                     }
                 }else{
-                    insertOtherPayment()
+                    if (otherPaymentReceived){
+                        insertOtherPayment()
+                    }
                 }
             }
         }
@@ -449,6 +460,7 @@ class SaleFragment : Fragment() {
             otherPaymentCollectionRef.document().set(OtherPaymentReceived(newCounter.toInt()))
             null
         }.addOnSuccessListener {
+            otherPaymentReceived = false
             Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
             binding.btnAddNewOtherPayment.isEnabled = true
         }.addOnFailureListener {
@@ -482,7 +494,9 @@ class SaleFragment : Fragment() {
                         binding.txtWholesaleTotal.text = totalWholesale.sum().toString()
                     }
                 }else{
-                    insertWholesaleCount()
+                    if (wholesaleCount){
+                        insertWholesaleCount()
+                    }
                 }
             }
         }
@@ -498,6 +512,7 @@ class SaleFragment : Fragment() {
             wholesaleCountCollectionRef.document().set(WholesaleCount(newCounter.toInt(), total = "="))
             null
         }.addOnSuccessListener {
+            wholesaleCount = false
             Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
             binding.btnAddNewWholesaleItem.isEnabled = true
         }.addOnFailureListener {
@@ -531,7 +546,9 @@ class SaleFragment : Fragment() {
                         binding.txtRetailTotal.text = totalRetailSale.sum().toString()
                     }
                 }else{
-                    insertProductCount()
+                    if (productCount){
+                        insertProductCount()
+                    }
                 }
             }
         }
@@ -547,6 +564,7 @@ class SaleFragment : Fragment() {
             productCountCollectionRef.document().set(ProductCount(newCounter.toInt(), total = "="))
             null
         }.addOnSuccessListener {
+            productCount = false
             Toast.makeText(requireContext(), "Item inserted!", Toast.LENGTH_SHORT).show()
             binding.btnAddNewProductItem.isEnabled = true
         }.addOnFailureListener {
