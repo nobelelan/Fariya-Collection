@@ -2,11 +2,10 @@ package com.example.fariyafardinfarhancollection.ui.fragment.store
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.*
 import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -35,7 +34,7 @@ import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 
 
-class StorehouseFragment : Fragment() {
+class StorehouseFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private var _binding: FragmentStorehouseBinding? = null
     private val binding get() = _binding!!
@@ -48,6 +47,8 @@ class StorehouseFragment : Fragment() {
     private val storeProductsCounterCollectionRef = Firebase.firestore.collection("allCounters")
 
     private var databaseContactsCounter: Int? = null
+
+    private var searchView: SearchView? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -145,6 +146,41 @@ class StorehouseFragment : Fragment() {
             }
             builder.create().show()
         }
+
+        setHasOptionsMenu(true)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.menu_records_fragment, menu)
+        val search = menu.findItem(R.id.menu_search)
+        searchView = search.actionView as? SearchView
+        searchView?.isSubmitButtonEnabled = true
+        searchView?.setOnQueryTextListener(this)
+    }
+
+    override fun onQueryTextSubmit(query: String?): Boolean{
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        if (newText != null){
+            searchThroughDatabase(newText)
+        }
+        return true
+    }
+
+    private fun searchThroughDatabase(query: String){
+        val searchQuery = "%$query%"
+        shopViewModel.searchStoreProduct(searchQuery).observe(this, Observer { storeProductList->
+            storeProductList?.let {
+                storeProductAdapter.differ.submitList(it)
+            }
+        })
+        searchView?.setOnQueryTextFocusChangeListener { view, hasFocus ->
+            if (!hasFocus){
+                activity?.recreate()
+            }
+        }
     }
 
     private fun setUpStoreProductRecyclerView() {
@@ -236,6 +272,11 @@ class StorehouseFragment : Fragment() {
             }
             builder.create().show()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        searchView?.isEnabled = false
     }
 
 //    override fun onDestroyView() {

@@ -36,6 +36,8 @@ class RecordsFragment : Fragment(), SearchView.OnQueryTextListener {
 
     private val recordsCollectionRef = Firebase.firestore.collection("saleTodays")
 
+    private var searchView: SearchView? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -81,7 +83,7 @@ class RecordsFragment : Fragment(), SearchView.OnQueryTextListener {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.menu_records_fragment, menu)
         val search = menu.findItem(R.id.menu_search)
-        val searchView = search.actionView as? SearchView
+        searchView = search.actionView as? SearchView
         searchView?.isSubmitButtonEnabled = true
         searchView?.setOnQueryTextListener(this)
     }
@@ -107,6 +109,11 @@ class RecordsFragment : Fragment(), SearchView.OnQueryTextListener {
                 salesAdapter.differ.submitList(it)
             }
         })
+        searchView?.setOnQueryTextFocusChangeListener { view, hasFocus ->
+            if (!hasFocus){
+                activity?.recreate()
+            }
+        }
     }
 
     private fun setUpRecyclerView() {

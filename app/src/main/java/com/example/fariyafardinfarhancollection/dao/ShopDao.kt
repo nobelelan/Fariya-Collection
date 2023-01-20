@@ -69,6 +69,8 @@ interface ShopDao {
     suspend fun updateCustomerContact(customerContact: CustomerContact)
     @Delete
     suspend fun deleteCustomerContact(customerContact: CustomerContact)
+    @Query("SELECT * FROM customer_contact_table WHERE name LIKE :customerContactQuery")
+    fun searchCustomerContact(customerContactQuery: String): LiveData<List<CustomerContact>>
 
     @Query("SELECT * FROM store_product_table ORDER BY storeProductId DESC")
     fun getAllStoreProduct(): LiveData<List<StoreProduct>>
@@ -78,6 +80,8 @@ interface ShopDao {
     suspend fun updateStoreProduct(storeProduct: StoreProduct)
     @Delete
     suspend fun deleteStoreProduct(storeProduct: StoreProduct)
+    @Query("SELECT * FROM store_product_table WHERE productName LIKE :storeProductQuery")
+    fun searchStoreProduct(storeProductQuery: String): LiveData<List<StoreProduct>>
 
     @Query("SELECT * FROM public_post_table ORDER BY publicPostId DESC")
     fun getAllPublicPost(): LiveData<List<PublicPost>>

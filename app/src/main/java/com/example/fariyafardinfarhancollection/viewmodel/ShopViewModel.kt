@@ -152,6 +152,9 @@ class ShopViewModel(
             shopRepository.deleteCustomerContact(customerContact)
         }
     }
+    fun searchCustomerContact(customerContactQuery: String): LiveData<List<CustomerContact>>{
+        return shopRepository.searchCustomerContact(customerContactQuery)
+    }
 
     fun insertStoreProduct(storeProduct: StoreProduct){
         viewModelScope.launch {
@@ -167,6 +170,9 @@ class ShopViewModel(
         viewModelScope.launch {
             shopRepository.deleteStoreProduct(storeProduct)
         }
+    }
+    fun searchStoreProduct(storeProductQuery: String): LiveData<List<StoreProduct>>{
+        return shopRepository.searchStoreProduct(storeProductQuery)
     }
 
     fun insertPublicPost(publicPost: PublicPost){
