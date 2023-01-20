@@ -68,9 +68,9 @@ class StorehouseFragment : Fragment() {
 
         setUpStoreProductRecyclerView()
 
-//        shopViewModel.getAllStoreProduct.observe(viewLifecycleOwner, Observer {
-//            storeProductAdapter.differ.submitList(it)
-//        })
+        shopViewModel.getAllStoreProduct.observe(viewLifecycleOwner, Observer {
+            storeProductAdapter.differ.submitList(it)
+        })
 
         storeProductsCollectionRef
             .orderBy("storeProductId", Query.Direction.DESCENDING)
@@ -81,7 +81,10 @@ class StorehouseFragment : Fragment() {
             value?.let {
                 if (it.documents.isNotEmpty()){
                     val productList = it.toObjects<StoreProduct>()
-                    storeProductAdapter.differ.submitList(productList)
+                    productList.forEach { product->
+                        shopViewModel.insertStoreProduct(product)
+                    }
+//                    storeProductAdapter.differ.submitList(productList)
                     binding.txtNoProducts.visibility = View.INVISIBLE
                 }else{
                     binding.txtNoProducts.visibility = View.VISIBLE
@@ -150,8 +153,8 @@ class StorehouseFragment : Fragment() {
         rvStoreProduct.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+//        val swipeToDeleteCallback = object : SwipeToDelete(){
+//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 // Deletion from room db
 //                val tobeDeletedItem = storeProductAdapter.differ.currentList[viewHolder.adapterPosition]
 //                shopViewModel.deleteStoreProduct(tobeDeletedItem)
@@ -161,36 +164,37 @@ class StorehouseFragment : Fragment() {
 //                    .show()
 
                 // Deletion from firestore
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Delete Product!")
-                builder.setMessage("Product information can never be restored.")
-                builder.setNegativeButton("Cancel"){_,_->}
-                builder.setPositiveButton("Delete"){_,_->
-                    val tobeDeletedItem = storeProductAdapter.differ.currentList[viewHolder.adapterPosition]
-                    storeProductsCollectionRef
-                        .whereEqualTo("storeProductId", tobeDeletedItem.storeProductId)
-                        .whereEqualTo("productName", tobeDeletedItem.productName)
-                        .whereEqualTo("quantityLeft", tobeDeletedItem.quantityLeft)
-                        .whereEqualTo("retailPrice", tobeDeletedItem.retailPrice)
-                        .whereEqualTo("wholesalePrice", tobeDeletedItem.wholesalePrice)
-                        .get()
-                        .addOnSuccessListener { querySnapshot->
-                            if (querySnapshot.documents.isNotEmpty()){
-                                querySnapshot?.forEach { documentSnapshot->
-                                    storeProductsCollectionRef.document(documentSnapshot.id).delete()
-                                        .addOnSuccessListener {
-                                            Toast.makeText(requireContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show()
-                                        }.addOnFailureListener {
-                                            Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
-                                        }
-                                }
-                            }
-                        }
-                }.create().show()
-            }
-        }
-        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvStoreProduct)
+//                val builder = AlertDialog.Builder(requireContext())
+//                builder.setTitle("Delete Product!")
+//                builder.setMessage("Product information can never be restored.")
+//                builder.setNegativeButton("Cancel"){_,_->}
+//                builder.setPositiveButton("Delete"){_,_->
+//                    val tobeDeletedItem = storeProductAdapter.differ.currentList[viewHolder.adapterPosition]
+//                    storeProductsCollectionRef
+//                        .whereEqualTo("storeProductId", tobeDeletedItem.storeProductId)
+//                        .whereEqualTo("productName", tobeDeletedItem.productName)
+//                        .whereEqualTo("quantityLeft", tobeDeletedItem.quantityLeft)
+//                        .whereEqualTo("retailPrice", tobeDeletedItem.retailPrice)
+//                        .whereEqualTo("wholesalePrice", tobeDeletedItem.wholesalePrice)
+//                        .get()
+//                        .addOnSuccessListener { querySnapshot->
+//                            if (querySnapshot.documents.isNotEmpty()){
+//                                querySnapshot?.forEach { documentSnapshot->
+//                                    storeProductsCollectionRef.document(documentSnapshot.id).delete()
+//                                        .addOnSuccessListener {
+//                                            shopViewModel.deleteStoreProduct(tobeDeletedItem)
+//                                            Toast.makeText(requireContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show()
+//                                        }.addOnFailureListener {
+//                                            Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+//                                        }
+//                                }
+//                            }
+//                        }
+//                }.create().show()
+//            }
+//        }
+//        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+//        itemTouchHelper.attachToRecyclerView(rvStoreProduct)
 
         binding.fabAddProduct.setOnClickListener {
             val inflater = LayoutInflater.from(requireContext())

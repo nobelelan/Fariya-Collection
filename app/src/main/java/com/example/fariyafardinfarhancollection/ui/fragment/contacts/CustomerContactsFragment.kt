@@ -58,16 +58,20 @@ class CustomerContactsFragment : Fragment() {
 
         val shopDao = ShopDatabase.getDatabase(requireContext()).shopDao()
         val shopRepository = ShopRepository(shopDao)
-        val shopViewModelProviderFactory = ShopViewModelProviderFactory(requireActivity().application, shopRepository)
-        shopViewModel = ViewModelProvider(this, shopViewModelProviderFactory)[ShopViewModel::class.java]
+        val shopViewModelProviderFactory =
+            ShopViewModelProviderFactory(requireActivity().application, shopRepository)
+        shopViewModel =
+            ViewModelProvider(this, shopViewModelProviderFactory)[ShopViewModel::class.java]
 
         setUpCustomerContactsRecyclerView()
 
-//        shopViewModel.getAllCustomerContacts.observe(viewLifecycleOwner, Observer {
-//            customerContactAdapter.differ.submitList(it)
-//        })
+        shopViewModel.getAllCustomerContacts.observe(viewLifecycleOwner, Observer {
+            customerContactAdapter.differ.submitList(it)
+        })
 
-//        contactsCollectionRef.get().addOnSuccessListener {
+//        contactsCollectionRef
+//            .orderBy("ccId", Query.Direction.DESCENDING)
+//            .get().addOnSuccessListener {
 //            val contactList = it.toObjects<CustomerContact>()
 //            customerContactAdapter.differ.submitList(contactList)
 //            contactList.forEach { contact->
@@ -78,19 +82,23 @@ class CustomerContactsFragment : Fragment() {
         contactsCollectionRef
             .orderBy("ccId", Query.Direction.DESCENDING)
             .addSnapshotListener { value, error ->
-            error?.let {
-                Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
-            }
-            value?.let {
-                if (it.documents.isNotEmpty()){
-                    val contactList = it.toObjects<CustomerContact>()
-                    customerContactAdapter.differ.submitList(contactList)
-                    binding.txtNoContacts.visibility = View.INVISIBLE
-                }else{
-                    binding.txtNoContacts.visibility = View.VISIBLE
+                error?.let {
+                    Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+                value?.let {
+                    if (it.documents.isNotEmpty()) {
+                        val contactList = it.toObjects<CustomerContact>()
+                        contactList.forEach { contact ->
+                            shopViewModel.insertCustomerContact(contact)
+                        }
+//                        customerContactAdapter.differ.submitList(contactList)
+                        binding.txtNoContacts.visibility = View.INVISIBLE
+                    } else {
+                        binding.txtNoContacts.visibility = View.VISIBLE
+                    }
                 }
             }
-        }
 
         customerContactAdapter.setOnEditClickListener {
             val inflater = LayoutInflater.from(requireContext())
@@ -104,13 +112,19 @@ class CustomerContactsFragment : Fragment() {
             val builder = AlertDialog.Builder(requireContext())
             builder.setView(ccBinding.root)
             builder.setTitle("Customer information")
-            builder.setNegativeButton("Cancel"){_,_->}
-            builder.setPositiveButton("Done"){_,_->
+            builder.setNegativeButton("Cancel") { _, _ -> }
+            builder.setPositiveButton("Done") { _, _ ->
                 val customerName = ccBinding.edtCustomerName.text.toString()
                 val customerContact = ccBinding.edtCustomerContact.text.toString()
                 val customerAddress = ccBinding.edtCustomerAddress.text.toString()
                 val customerDue = ccBinding.edtCustomerDue.text.toString()
-                if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue)){
+                if (verifyCustomerInformation(
+                        customerName,
+                        customerContact,
+                        customerAddress,
+                        customerDue
+                    )
+                ) {
                     contactsCollectionRef
                         .whereEqualTo("ccId", it.ccId)
                         .whereEqualTo("name", it.name)
@@ -118,34 +132,48 @@ class CustomerContactsFragment : Fragment() {
                         .whereEqualTo("address", it.address)
                         .whereEqualTo("due", it.due)
                         .get()
-                        .addOnSuccessListener { querySnapshot->
-                            if (querySnapshot.documents.isNotEmpty()){
-                                querySnapshot.forEach { documentSnapshot->
-                                    Firebase.firestore.runTransaction { transaction->
-                                        val contactRef = contactsCollectionRef.document(documentSnapshot.id)
+                        .addOnSuccessListener { querySnapshot ->
+                            if (querySnapshot.documents.isNotEmpty()) {
+                                querySnapshot.forEach { documentSnapshot ->
+                                    Firebase.firestore.runTransaction { transaction ->
+                                        val contactRef =
+                                            contactsCollectionRef.document(documentSnapshot.id)
                                         transaction.get(contactRef)
                                         transaction.update(contactRef, "name", customerName)
                                         transaction.update(contactRef, "number", customerContact)
                                         transaction.update(contactRef, "address", customerAddress)
                                         transaction.update(contactRef, "due", customerDue.toInt())
                                         null
-                                    }.addOnSuccessListener { nothing->
+                                    }.addOnSuccessListener { nothing ->
 //                                        shopViewModel.updateCustomerContact(CustomerContact(it.ccId, customerName, customerContact, customerAddress, customerDue.toInt()))
-                                        Toast.makeText(requireContext(), "Updated Successfully!", Toast.LENGTH_SHORT).show()
-                                    }.addOnFailureListener{
-                                        Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Updated Successfully!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }.addOnFailureListener {
+                                        Toast.makeText(
+                                            requireContext(),
+                                            "Something went wrong!",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                             }
 
                         }
-                }else{
-                    Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Please fill out required fields!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
             builder.create().show()
         }
-        customerContactAdapter.setMakeCallClickListener(object :CustomerContactAdapter.ClickListener{
+        customerContactAdapter.setMakeCallClickListener(object :
+            CustomerContactAdapter.ClickListener {
             override fun onMakeCallClick(customerNumber: String) {
                 val intent = Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", customerNumber, null))
                 activity?.startActivity(intent)
@@ -158,8 +186,10 @@ class CustomerContactsFragment : Fragment() {
         rvCustomerContact.adapter = customerContactAdapter
         rvCustomerContact.layoutManager = LinearLayoutManager(requireContext())
 
-        val swipeToDeleteCallback = object : SwipeToDelete(){
-            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        // TODO: when delete from online, local offline delete works too but other device local remains same,other ones are same
+
+//        val swipeToDeleteCallback = object : SwipeToDelete() {
+//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 // Deletion from database
 //                val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
 //                shopViewModel.deleteCustomerContact(tobeDeletedItem)
@@ -169,36 +199,46 @@ class CustomerContactsFragment : Fragment() {
 //                    .show()
 
                 // Deletion from firestore
-                val builder = AlertDialog.Builder(requireContext())
-                builder.setTitle("Delete Contact!")
-                builder.setMessage("Contact information can never be restored.")
-                builder.setNegativeButton("Cancel"){_,_->}
-                builder.setPositiveButton("Delete"){_,_->
-                    val tobeDeletedItem = customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
-                    contactsCollectionRef
-                        .whereEqualTo("ccId", tobeDeletedItem.ccId)
-                        .whereEqualTo("name", tobeDeletedItem.name)
-                        .whereEqualTo("number", tobeDeletedItem.number)
-                        .whereEqualTo("address", tobeDeletedItem.address)
-                        .whereEqualTo("due", tobeDeletedItem.due)
-                        .get()
-                        .addOnSuccessListener { querySnapshot->
-                            if (querySnapshot.documents.isNotEmpty()){
-                                querySnapshot?.forEach { documentSnapshot->
-                                    contactsCollectionRef.document(documentSnapshot.id).delete()
-                                        .addOnSuccessListener {
-                                            Toast.makeText(requireContext(), "Successfully Deleted!", Toast.LENGTH_SHORT).show()
-                                        }.addOnFailureListener {
-                                            Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
-                                        }
-                                }
-                            }
-                        }
-                }.create().show()
-            }
-        }
-        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
-        itemTouchHelper.attachToRecyclerView(rvCustomerContact)
+//                val builder = AlertDialog.Builder(requireContext())
+//                builder.setTitle("Delete Contact!")
+//                builder.setMessage("Contact information can never be restored.")
+//                builder.setNegativeButton("Cancel") { _, _ -> }
+//                builder.setPositiveButton("Delete") { _, _ ->
+//                    val tobeDeletedItem =
+//                        customerContactAdapter.differ.currentList[viewHolder.adapterPosition]
+//                    contactsCollectionRef
+//                        .whereEqualTo("ccId", tobeDeletedItem.ccId)
+//                        .whereEqualTo("name", tobeDeletedItem.name)
+//                        .whereEqualTo("number", tobeDeletedItem.number)
+//                        .whereEqualTo("address", tobeDeletedItem.address)
+//                        .whereEqualTo("due", tobeDeletedItem.due)
+//                        .get()
+//                        .addOnSuccessListener { querySnapshot ->
+//                            if (querySnapshot.documents.isNotEmpty()) {
+//                                querySnapshot?.forEach { documentSnapshot ->
+//                                    contactsCollectionRef.document(documentSnapshot.id).delete()
+//                                        .addOnSuccessListener {
+//                                            shopViewModel.deleteCustomerContact(tobeDeletedItem)
+//                                            Toast.makeText(
+//                                                requireContext(),
+//                                                "Successfully Deleted!",
+//                                                Toast.LENGTH_SHORT
+//                                            ).show()
+//                                        }.addOnFailureListener {
+//                                            Toast.makeText(
+//                                                requireContext(),
+//                                                "Something went wrong!",
+//                                                Toast.LENGTH_SHORT
+//                                            ).show()
+//                                        }
+//                                }
+//                            }
+//                        }
+//                }.create().show()
+//            }
+//        }
+//        val itemTouchHelper = ItemTouchHelper(swipeToDeleteCallback)
+//        itemTouchHelper.attachToRecyclerView(rvCustomerContact)
 
         binding.fabAddContact.setOnClickListener {
             val inflater = LayoutInflater.from(requireContext())
@@ -206,36 +246,56 @@ class CustomerContactsFragment : Fragment() {
             val builder = AlertDialog.Builder(requireContext())
             builder.setView(ccBinding.root)
             builder.setTitle("Customer information")
-            builder.setNegativeButton("Cancel"){_,_->}
-            builder.setPositiveButton("Done"){_,_->
+            builder.setNegativeButton("Cancel") { _, _ -> }
+            builder.setPositiveButton("Done") { _, _ ->
                 val customerName = ccBinding.edtCustomerName.text.toString()
                 val customerContact = ccBinding.edtCustomerContact.text.toString()
                 val customerAddress = ccBinding.edtCustomerAddress.text.toString()
                 val customerDue = ccBinding.edtCustomerDue.text.toString()
-                if (verifyCustomerInformation(customerName, customerContact, customerAddress, customerDue)){
-                    Firebase.firestore.runTransaction { transaction->
+                if (verifyCustomerInformation(
+                        customerName,
+                        customerContact,
+                        customerAddress,
+                        customerDue
+                    )
+                ) {
+                    Firebase.firestore.runTransaction { transaction ->
                         val counterRef = contactsCounterCollectionRef.document("contactsCounter")
                         val counter = transaction.get(counterRef)
                         val newCounter = counter["ccId"] as Long + 1
                         databaseContactsCounter = newCounter.toInt()
-                        transaction.update(counterRef,"ccId", newCounter)
+                        transaction.update(counterRef, "ccId", newCounter)
 
-                        contactsCollectionRef.document().set(CustomerContact(
-                            newCounter.toInt(),
-                            customerName,
-                            customerContact,
-                            customerAddress,
-                            customerDue.toIntOrNull()
-                        ))
+                        contactsCollectionRef.document().set(
+                            CustomerContact(
+                                newCounter.toInt(),
+                                customerName,
+                                customerContact,
+                                customerAddress,
+                                customerDue.toIntOrNull()
+                            )
+                        )
                         null
                     }.addOnSuccessListener {
 //                        shopViewModel.insertCustomerContact(CustomerContact(databaseContactsCounter!!, customerName, customerContact, customerAddress, customerDue.toIntOrNull()))
-                        Toast.makeText(requireContext(), "New Contact Inserted!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "New Contact Inserted!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }.addOnFailureListener {
-                        Toast.makeText(requireContext(), "Something went wrong!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Something went wrong!",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
-                }else{
-                    Toast.makeText(requireContext(), "Please fill out required fields!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Please fill out required fields!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
             builder.create().show()
