@@ -56,6 +56,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
+import java.time.DayOfWeek
 import java.util.*
 
 class ExtraFragment : Fragment() {
@@ -331,10 +332,12 @@ class ExtraFragment : Fragment() {
 
         binding.btnCreatePost.setOnClickListener {
             val calender = Calendar.getInstance()
-            val time = calender.time
+            val year = calender.get(Calendar.YEAR)
+            val month = calender.get(Calendar.MONTH)
+            val day = calender.get(Calendar.DAY_OF_MONTH)
+            val date = " $day/${month + 1}/$year "
 
             val employeeName = currentEmployee?.username
-            val dateAndTime = "$time"
             val post = binding.edtCreatePost.text.toString()
 
             PushNotification(
@@ -343,6 +346,10 @@ class ExtraFragment : Fragment() {
             ).also {
                 sendNotification(it)
             }
+            val hour = calender.get(Calendar.HOUR)
+            val minute = calender.get(Calendar.MINUTE)
+            val am_pm = if (calender.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+            val time12HourFormat = "$hour:$minute $am_pm"
 
             Firebase.firestore.runTransaction { transaction->
                 val counterRef = publicPostsCounterCollectionRef.document("publicPostsCounter")
@@ -351,7 +358,7 @@ class ExtraFragment : Fragment() {
                 databasePostsCounter = newCounter.toInt()
                 transaction.update(counterRef,"publicPostId", newCounter)
 
-                publicPostsCollectionRef.document().set(PublicPost(newCounter.toInt(), employeeName, dateAndTime, post))
+                publicPostsCollectionRef.document().set(PublicPost(newCounter.toInt(), employeeName, "$time12HourFormat, $date", post))
                 null
             }.addOnSuccessListener {
 //              shopViewModel.insertPublicPost(PublicPost(0, employeeName, dateAndTime, post))

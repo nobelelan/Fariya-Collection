@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.content.Context.MODE_PRIVATE
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -18,9 +19,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollection.R
 import com.example.fariyafardinfarhancollection.SwipeToDelete
+import com.example.fariyafardinfarhancollection.TOPIC
 import com.example.fariyafardinfarhancollection.database.ShopDatabase
 import com.example.fariyafardinfarhancollection.databinding.FragmentSaleBinding
 import com.example.fariyafardinfarhancollection.model.*
+import com.example.fariyafardinfarhancollection.notification.NotificationData
+import com.example.fariyafardinfarhancollection.notification.PushNotification
+import com.example.fariyafardinfarhancollection.notification.RetrofitInstance
 import com.example.fariyafardinfarhancollection.repository.ShopRepository
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModel
 import com.example.fariyafardinfarhancollection.viewmodel.ShopViewModelProviderFactory
@@ -31,6 +36,9 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.util.*
 
@@ -53,6 +61,7 @@ class SaleFragment : Fragment() {
     private val wholesaleCountCollectionRef = Firebase.firestore.collection("wholesaleCounts")
     private val otherPaymentCollectionRef = Firebase.firestore.collection("otherPayments")
     private val spentTodayCollectionRef = Firebase.firestore.collection("spentTodays")
+    private val employeeAttendenceRef = Firebase.firestore.collection("employeeAttendence")
 
     private var databaseSaleTodayCounter: Int? = null
     private var databaseProductCountCounter: Int? = null
@@ -664,6 +673,11 @@ class SaleFragment : Fragment() {
             binding.txtCurrentDate.text = " $day/${month + 1}/$year "
         }
 
+        val hour = calender.get(Calendar.HOUR)
+        val minute = calender.get(Calendar.MINUTE)
+        val am_pm = if (calender.get(Calendar.AM_PM) == Calendar.AM) "AM" else "PM"
+        val time12HourFormat = "$hour:$minute $am_pm"
+
         binding.txtCurrentDateUpdate.setOnClickListener {
             DatePickerDialog(requireContext(), DatePickerDialog.OnDateSetListener{view, mYear, mMonth, mDay ->
                 binding.txtCurrentDate.text = " $mDay/${mMonth + 1}/$mYear "
@@ -671,7 +685,42 @@ class SaleFragment : Fragment() {
                 editor?.apply()
             },year, month, day).show()
         }
+        binding.txtPresent.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setMessage("Are you present at the shop?")
+                .setNegativeButton("No"){_,_->}
+                .setPositiveButton("Yes"){_,_->
+                    employeeAttendenceRef.document(auth.currentUser!!.uid).collection("days").add(
+                        mapOf(
+                            "presentDateTime" to binding.txtCurrentDate.text.toString(),
+                            "enteredTime" to time12HourFormat
+                        )
+                    ).addOnSuccessListener {
+                        Toast.makeText(requireContext(), "Attendance Taken!", Toast.LENGTH_SHORT).show()
+                        PushNotification(
+                            NotificationData("${currentEmployee?.username!!} entered the shop.", time12HourFormat),
+                            TOPIC
+                        ).also {
+                            sendNotification(it)
+                        }
+                    }.addOnFailureListener {
+                        Toast.makeText(requireContext(), "Failed, try again!", Toast.LENGTH_SHORT).show()
+                    }
+                }.create().show()
+        }
     }
+    private fun sendNotification(notification: PushNotification) =
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitInstance.api.postNotification(notification)
+//                if (response.isSuccessful) {
+//                    Log.d("ExtraFragment", "Response: ${Gson().toJson(response)}")
+//                }
+            } catch (e: Exception) {
+                Log.e("ExtraFragment", e.toString())
+            }
+
+        }
 
 //    @SuppressLint("SetTextI18n")
 //    private fun setTotalWholesale() {
