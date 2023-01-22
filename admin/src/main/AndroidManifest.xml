@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FariyaCollection">
         <activity
-            android:name=".ui.TestActivity"
+            android:name=".ui.PrimaryActivity"
             android:exported="false" />
         <activity
             android:name=".ui.LoginActivity"

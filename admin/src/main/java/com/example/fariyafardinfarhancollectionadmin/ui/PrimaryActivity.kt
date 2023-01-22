@@ -4,17 +4,17 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.fariyafardinfarhancollectionadmin.databinding.ActivityTestBinding
+import com.example.fariyafardinfarhancollectionadmin.R
+import com.example.fariyafardinfarhancollectionadmin.databinding.ActivityPrimaryBinding
 import com.example.fariyafardinfarhancollectionadmin.model.Employee
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class TestActivity : AppCompatActivity() {
+class PrimaryActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityTestBinding
+    private lateinit var binding: ActivityPrimaryBinding
 
     private lateinit var auth: FirebaseAuth
 
@@ -22,7 +22,7 @@ class TestActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityTestBinding.inflate(layoutInflater)
+        binding = ActivityPrimaryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         auth = Firebase.auth

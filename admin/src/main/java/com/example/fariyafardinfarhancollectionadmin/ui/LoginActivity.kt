@@ -51,7 +51,7 @@ class LoginActivity : AppCompatActivity() {
             documentSnapshot.get().addOnSuccessListener {
                 if (it.getString("employee") == "no"){
                     Toast.makeText(this, "Sign in successful!", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, TestActivity::class.java))
+                    startActivity(Intent(this, PrimaryActivity::class.java))
                 }else{
                     Toast.makeText(this, "Sorry, you don't have access in admin module.", Toast.LENGTH_LONG).show()
                     auth.signOut()
@@ -63,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         if (FirebaseAuth.getInstance().currentUser != null){
-            startActivity(Intent(this, TestActivity::class.java))
+            startActivity(Intent(this, PrimaryActivity::class.java))
         }
     }
 }
