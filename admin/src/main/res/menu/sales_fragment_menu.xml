@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:id="@+id/menu_register_users"
+        android:title="@string/pending_registrations"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/menu_sign_off"
+        android:title="@string/sign_off"
+        app:showAsAction="never"/>
+</menu>

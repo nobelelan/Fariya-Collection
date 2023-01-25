@@ -1,64 +1,61 @@
 package com.example.fariyafardinfarhancollectionadmin.ui
 
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.annotation.RequiresApi
+import androidx.lifecycle.LiveData
+import androidx.navigation.NavController
+import androidx.navigation.ui.setupActionBarWithNavController
 import com.example.fariyafardinfarhancollectionadmin.R
 import com.example.fariyafardinfarhancollectionadmin.databinding.ActivityPrimaryBinding
-import com.example.fariyafardinfarhancollectionadmin.model.Employee
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.example.fariyafardinfarhancollectionadmin.setupWithNavController
 
 class PrimaryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPrimaryBinding
 
-    private lateinit var auth: FirebaseAuth
+    private var navController: LiveData<NavController>? = null
 
-    private val testActivityAdapter by lazy { TestActivityAdapter() }
-
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPrimaryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
-        auth = Firebase.auth
+        if (savedInstanceState == null)
+            setUpBottomNav()
 
-        binding.btnSignOut.setOnClickListener {
-            auth.signOut()
-            finish()
-        }
-
-        val recyclerView = binding.rvRegisterRequestedEmployees
-        recyclerView.adapter = testActivityAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        Firebase.firestore.collection("toRegisterEmployees").get()
-            .addOnSuccessListener { employeeSnapshot ->
-                val registerRequestEmployeeList = arrayListOf<Employee>()
-                employeeSnapshot.forEach {
-                    val employee = it.toObject(Employee::class.java)
-                    registerRequestEmployeeList.add(employee)
-                }
-                testActivityAdapter.differ.submitList(registerRequestEmployeeList)
-            }
-
-        testActivityAdapter.setOnItemClickListener { employee ->
-            auth.createUserWithEmailAndPassword(employee.email, employee.password)
-                .addOnSuccessListener {
-                    Toast.makeText(this, "${employee.username} successfully registered!", Toast.LENGTH_SHORT).show()
-                    auth.currentUser?.let {
-                        val registeredEmployee = Employee(employee.username, employee.email, employee.contact)
-                        val registeredDocumentReference = Firebase.firestore.collection("registeredEmployees").document(it.uid)
-                        registeredDocumentReference.set(registeredEmployee)
-                    }
-                }
-                .addOnFailureListener{
-                    Toast.makeText(this, "Registration failed!", Toast.LENGTH_SHORT).show()
-                }
-        }
     }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        setUpBottomNav()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun setUpBottomNav() {
+        val graphIds = listOf(
+            R.navigation.first_nav_graph,
+            R.navigation.second_nav_graph,
+            R.navigation.third_nav_graph
+        )
+        val controller = binding.bottomNavigationView.setupWithNavController(
+            graphIds,
+            supportFragmentManager,
+            R.id.nav_host_fragment,
+            intent
+        )
+        controller.observe(this){
+            setupActionBarWithNavController(it)
+        }
+        navController = controller
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController?.value?.navigateUp()!! || super.onSupportNavigateUp()
+    }
+
 }

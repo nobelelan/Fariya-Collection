@@ -1,4 +1,4 @@
-package com.example.fariyafardinfarhancollectionadmin.ui
+package com.example.fariyafardinfarhancollectionadmin.ui.fragment.register
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.fariyafardinfarhancollectionadmin.databinding.RvTestActivityBinding
 import com.example.fariyafardinfarhancollectionadmin.model.Employee
 
-class TestActivityAdapter: RecyclerView.Adapter<TestActivityAdapter.TestActivityViewHolder>() {
+class RegisterAdapter: RecyclerView.Adapter<RegisterAdapter.TestActivityViewHolder>() {
 
     inner class TestActivityViewHolder(val binding: RvTestActivityBinding): RecyclerView.ViewHolder(binding.root)
 
