@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/txt_date"
@@ -32,4 +32,17 @@
         app:layout_constraintBottom_toBottomOf="@+id/txt_date"
         app:layout_constraintStart_toEndOf="@+id/txt_date"
         app:layout_constraintTop_toTopOf="@+id/txt_date" />
+
+    <TextView
+        android:id="@+id/txt_employee_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:text="Name"
+        android:fontFamily="@font/gilroy_bold"
+        android:textSize="18sp"
+        android:textColor="@color/green"
+        app:layout_constraintBottom_toBottomOf="@+id/txt_time"
+        app:layout_constraintStart_toEndOf="@+id/txt_time"
+        app:layout_constraintTop_toTopOf="@+id/txt_time" />
 </androidx.constraintlayout.widget.ConstraintLayout>

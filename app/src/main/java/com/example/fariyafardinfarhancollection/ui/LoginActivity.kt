@@ -24,6 +24,9 @@ class LoginActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
+        if (FirebaseAuth.getInstance().currentUser != null){
+            startActivity(Intent(this, HomeActivity::class.java))
+        }
 
         binding.btnSignUp.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
@@ -64,10 +67,4 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        if (FirebaseAuth.getInstance().currentUser != null){
-            startActivity(Intent(this, HomeActivity::class.java))
-        }
-    }
 }

@@ -24,6 +24,9 @@ class LoginActivity : AppCompatActivity() {
 
         auth = Firebase.auth
 
+        if (FirebaseAuth.getInstance().currentUser != null){
+            startActivity(Intent(this, PrimaryActivity::class.java))
+        }
 
         binding.btnSignIn.setOnClickListener {
             val email = binding.edtEmail.text.toString()
@@ -57,13 +60,6 @@ class LoginActivity : AppCompatActivity() {
                     auth.signOut()
                 }
             }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (FirebaseAuth.getInstance().currentUser != null){
-            startActivity(Intent(this, PrimaryActivity::class.java))
         }
     }
 }

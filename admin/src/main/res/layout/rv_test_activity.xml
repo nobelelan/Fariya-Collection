@@ -10,9 +10,10 @@
         android:id="@+id/txtUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TextView"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Name"
+        android:textSize="16sp"
+        android:fontFamily="@font/gilroy_bold"
+        app:layout_constraintEnd_toStartOf="@+id/btnRegisterUser"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -20,10 +21,12 @@
     <TextView
         android:id="@+id/txtEmail"
         android:layout_width="wrap_content"
-        android:layout_height="24dp"
+        android:layout_height="0dp"
         android:layout_marginTop="8dp"
-        android:text="TextView"
-        android:textSize="18sp"
+        android:fontFamily="@font/gilroy_light"
+        android:text="Email"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,18 +36,24 @@
         android:id="@+id/txt_contact"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="contact"
+        android:fontFamily="@font/gilroy_light"
+        android:text="Contact"
+        android:textSize="16sp"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/txtEmail"
+        app:layout_constraintVertical_bias="0.0" />
 
-    <Button
+    <TextView
         android:id="@+id/btnRegisterUser"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/gilroy_bold"
+        android:textColor="@color/green"
         android:text="Register User"
+        android:padding="4dp"
+        android:background="@drawable/custom_input"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
